@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
@@ -41,6 +41,27 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground
+    uniqueID: 3166745919
+    locked: 0
+  - name: GroundDecor
+    uniqueID: 1797751489
+    locked: 0
+  - name: BuildingLower
+    uniqueID: 2809949143
+    locked: 0
+  - name: Character
+    uniqueID: 1620861021
+    locked: 0
+  - name: BuildingUpper
+    uniqueID: 3255017651
+    locked: 0
+  - name: Overhead
+    uniqueID: 2549973123
+    locked: 0
+  - name: UI
+    uniqueID: 3488603171
+    locked: 0
   m_RenderingLayers:
   - Default
   - Light Layer 1
@@ -50,27 +71,3 @@ TagManager:
   - Light Layer 5
   - Light Layer 6
   - Light Layer 7
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
