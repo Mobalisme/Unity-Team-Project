@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 503d731f15a35ae43a9b4453db16ea8b
+guid: a0fa5f85deeffe24d82df86d2466f438
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 516
+  spritePixelsToUnits: 128
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,23 +97,45 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Bridge2_0
+      name: Hut3_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 512
         width: 1024
-        height: 1024
+        height: 512
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 53032259ec167e843b299a02bb75baab
-      internalID: -330449285
+      spriteID: 9a3850d956f54db42babde7a3cfafe81
+      internalID: 1706247129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hut3_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1024
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d66deac39d3a09549b4b7c7fb44e7c68
+      internalID: 275291614
       vertices: []
       indices: 
       edges: []
@@ -122,7 +144,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 55fc36b7b3cab824c9b7791e81f957ec
+    spriteID: aaa6104907f0f3d45879cc312bede15a
     internalID: 0
     vertices: []
     indices: 
@@ -132,7 +154,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Bridge2_0: -330449285
+      Hut3_0: 1706247129
+      Hut3_1: 275291614
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

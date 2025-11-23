@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 503d731f15a35ae43a9b4453db16ea8b
+guid: 6ab21079ae66edb4b9608ee6ff8a9842
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 516
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,23 +97,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Bridge2_0
+      name: Lake Fence7_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1024
-        height: 1024
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        width: 22
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 53032259ec167e843b299a02bb75baab
-      internalID: -330449285
+      spriteID: 2bc4164845945a1408c42f9ccabc4008
+      internalID: -995519198
       vertices: []
       indices: 
       edges: []
@@ -122,7 +122,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 55fc36b7b3cab824c9b7791e81f957ec
+    spriteID: c477d251d218950468e992e5afbafe65
     internalID: 0
     vertices: []
     indices: 
@@ -132,7 +132,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Bridge2_0: -330449285
+      Lake Fence7_0: -995519198
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
