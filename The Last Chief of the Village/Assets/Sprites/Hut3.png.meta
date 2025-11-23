@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a0fa5f85deeffe24d82df86d2466f438
+guid: 7ae2c11ba3ecae84ebc1e7167c14595f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -102,7 +102,7 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 512
-        width: 1024
+        width: 341
         height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -112,8 +112,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9a3850d956f54db42babde7a3cfafe81
-      internalID: 1706247129
+      spriteID: 38e52aaf2a696a44bb77948f9ed10c4f
+      internalID: 854447195
       vertices: []
       indices: 
       edges: []
@@ -122,9 +122,9 @@ TextureImporter:
       name: Hut3_1
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
+        x: 341
+        y: 512
+        width: 341
         height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -134,8 +134,96 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d66deac39d3a09549b4b7c7fb44e7c68
-      internalID: 275291614
+      spriteID: 2b107f489c4b6e144857ad9ca4da9818
+      internalID: 1735724877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hut3_2
+      rect:
+        serializedVersion: 2
+        x: 682
+        y: 512
+        width: 341
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d8af57ebfab7d34d806e8fcb6c828d0
+      internalID: -1586045908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hut3_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 341
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 050011b4dd983354caae58bd607f40aa
+      internalID: -1429559289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hut3_4
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 0
+        width: 341
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 426ff8cfd7ad5d64db171ba8773f8945
+      internalID: -1655402497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hut3_5
+      rect:
+        serializedVersion: 2
+        x: 682
+        y: 0
+        width: 341
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 736fa417bc2478849beedca48521fd50
+      internalID: 1778701117
       vertices: []
       indices: 
       edges: []
@@ -144,7 +232,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: aaa6104907f0f3d45879cc312bede15a
+    spriteID: 5dd832af6d7351b40bd3991f06c3627c
     internalID: 0
     vertices: []
     indices: 
@@ -154,8 +242,12 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Hut3_0: 1706247129
-      Hut3_1: 275291614
+      Hut3_0: 854447195
+      Hut3_1: 1735724877
+      Hut3_2: -1586045908
+      Hut3_3: -1429559289
+      Hut3_4: -1655402497
+      Hut3_5: 1778701117
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
