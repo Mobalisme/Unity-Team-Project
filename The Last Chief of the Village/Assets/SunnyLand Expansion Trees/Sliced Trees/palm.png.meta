@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bce2d1c9ca0475e4cb876c354b7b0121
+guid: d00948e821f5e424ea01b186fe00a588
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -126,5 +126,5 @@ AssetOrigin:
   productId: 237697
   packageName: SunnyLand Expansion Pack Trees
   packageVersion: 1.0
-  assetPath: Assets/Sprites/tree.png
+  assetPath: Assets/SunnyLand Expansion Trees/Sliced Trees/palm.png
   uploadId: 539361
