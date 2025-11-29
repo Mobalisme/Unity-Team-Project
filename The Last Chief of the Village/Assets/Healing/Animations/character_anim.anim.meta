@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d985c8976ba0418458cc7c859a475ca8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 303316
+  packageName: 2D Cozy Animation
+  packageVersion: 1.0
+  assetPath: Assets/Mythmatic_Cozy_Animation_01/Animations/character_anim.anim
+  uploadId: 711383

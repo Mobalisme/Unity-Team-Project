@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Yurt1_grass_shadow_0
+      name: Hut04_0
       rect:
         serializedVersion: 2
-        x: 24
-        y: 64
-        width: 80
-        height: 38
+        x: 28
+        y: 65
+        width: 71
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,20 +112,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 63a09e2b978378c45aee0ef7b865992f
-      internalID: 724910509
+      spriteID: d05dfb5bee2dabe4fbae66083edc2446
+      internalID: -847313609
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Yurt1_grass_shadow_1
+      name: Hut04_1
       rect:
         serializedVersion: 2
-        x: 24
-        y: 26
-        width: 80
-        height: 38
+        x: 28
+        y: 31
+        width: 71
+        height: 34
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,8 +134,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fb46b461a4f368a489adc899b2b5dfd0
-      internalID: -1354043982
+      spriteID: 6385eab8163d0444c96ff916ffe42c8f
+      internalID: 24476540
       vertices: []
       indices: 
       edges: []
@@ -144,7 +144,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: d02c63264c4788c45908457a00750788
+    spriteID: e0211d008ebd7804a81e58213cfb344d
     internalID: 0
     vertices: []
     indices: 
@@ -154,8 +154,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Yurt1_grass_shadow_0: 724910509
-      Yurt1_grass_shadow_1: -1354043982
+      Hut04_0: -847313609
+      Hut04_1: 24476540
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
