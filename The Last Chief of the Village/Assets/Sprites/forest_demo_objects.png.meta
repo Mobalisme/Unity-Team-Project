@@ -189,9 +189,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 177
-        y: 208
-        width: 31
-        height: 48
+        y: 224
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -453,9 +453,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 241
-        y: 192
+        y: 208
         width: 14
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -778,6 +778,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: forest_demo_objects_31
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 208
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 81ea49341e3d1c140b52f8db062c0514
+      internalID: -892147375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: forest_demo_objects_32
+      rect:
+        serializedVersion: 2
+        x: 241
+        y: 190
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e06cfc40f5f238c4eab0565c6874669c
+      internalID: 844201145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -817,6 +861,8 @@ TextureImporter:
       forest_demo_objects_29: -1775413410
       forest_demo_objects_3: 1499332688
       forest_demo_objects_30: 223986525
+      forest_demo_objects_31: -892147375
+      forest_demo_objects_32: 844201145
       forest_demo_objects_4: 1199132738
       forest_demo_objects_5: -211106410
       forest_demo_objects_6: 268533258
