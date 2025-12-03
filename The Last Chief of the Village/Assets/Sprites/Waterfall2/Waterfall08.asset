@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: Waterfall08
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: 1348954472, guid: cfdc91dfa4f8cf3409565dacdf0f2100, type: 3}
+  - {fileID: 1631050379, guid: fd7f9f3b33973e944b065c1ec96d1f9f, type: 3}
+  - {fileID: 1581245374, guid: 0496a20f9e0439f42935ca0918e96546, type: 3}
+  - {fileID: 164612090, guid: 1dec3fd9c3fdd154ebcabf381909eee4, type: 3}
+  - {fileID: -92652278, guid: 53e25dcf195b424489bf134dd6948155, type: 3}
+  - {fileID: 828572766, guid: d49cf7f1b2e06d64e8c65d668ce36f55, type: 3}
+  m_MinSpeed: 6
+  m_MaxSpeed: 6
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 0
+  m_TileAnimationFlags: 0
