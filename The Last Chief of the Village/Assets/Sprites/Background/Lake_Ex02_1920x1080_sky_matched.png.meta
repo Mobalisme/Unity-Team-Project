@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8db10cc7d887da0498b74783a59477a7
+guid: c83970695e5bd554bac2f3c349b9897c
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 36
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Waterfall i_0
+      name: Lake_Ex02_1920x1080_sky_matched_0
       rect:
         serializedVersion: 2
         x: 0
@@ -112,8 +112,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 609403ffd18c97540a6c759c1e3d999a
-      internalID: -574019510
+      spriteID: 1ff3025d68707cd4fa6455ff6639b1c0
+      internalID: -1424438794
       vertices: []
       indices: 
       edges: []
@@ -122,7 +122,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: f7f92b98dc23c0342a1c21cead1253fe
+    spriteID: 878698ec3ebe9db47bece4cde0e485e4
     internalID: 0
     vertices: []
     indices: 
@@ -132,7 +132,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Waterfall i_0: -574019510
+      Lake_Ex02_1920x1080_sky_matched_0: -1424438794
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
