@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a6d6dd85ddd973241ab0fa847b2f1ca8
+guid: 2aad1a595f85d694092430e4e078100d
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: KakaoTalk_20251213_010538928_0
+      name: PlayerDino3_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1024
-        height: 1024
+        width: 2048
+        height: 2048
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 39d3f9cd1ba531b4da34c0ed3ad117e6
-      internalID: 1569449700
+      spriteID: fa83e37d90a157f4a967b3c23589e2a7
+      internalID: -1098475573
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: aba1c91276da700489bd27c4889927ff
+    spriteID: 3be533b88e823c240b5bb906ffdd4781
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      KakaoTalk_20251213_010538928_0: 1569449700
+      PlayerDino3_0: -1098475573
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,71 +1,66 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class BattleUI : MonoBehaviour
 {
+    [Header("Root")]
     public GameObject panel;
+
+    [Header("Text")]
     public TMP_Text messageText;
 
+    [Header("Buttons")]
     public Button attackButton;
-    public Button defendButton;
+    public Button defendButton; // Recover ë²„íŠ¼ìœ¼ë¡œ ì‚¬ìš©
 
     public void Show(bool active)
     {
-        panel.SetActive(active);
+        if (panel != null) panel.SetActive(active);
     }
 
     public void SetMessage(string msg)
     {
-        messageText.text = msg;
-        Debug.Log($"[UI ¸Ş½ÃÁö] {msg}");
+        if (messageText != null) messageText.text = msg;
     }
 
-    // ÇÃ·¹ÀÌ¾î°¡ ¼±ÅÃÇÒ ¼ö ÀÖ´Â »óÅÂ (¹öÆ° È°¼ºÈ­)
     public void ShowPlayerTurn()
     {
         Show(true);
-        SetMessage("ÇÃ·¹ÀÌ¾î´Â ¹«¾ùÀ» ÇÒ Áö ¼±ÅÃÇÏ¼¼¿ä!");
+        SetMessage("í”Œë ˆì´ì–´ëŠ” ë¬´ì—‡ì„ í•  ì§€ ì„ íƒí•˜ì„¸ìš”!");
         SetButtonsInteractable(true);
     }
 
-    // Àû ÅÏ Ç¥½Ã (¹öÆ° ºñÈ°¼ºÈ­)
     public void ShowEnemyTurn()
     {
         Show(true);
-        SetMessage("ÀûÀÇ Â÷·ÊÀÔ´Ï´Ù!");
+        SetMessage("ì ì˜ ì°¨ë¡€ì…ë‹ˆë‹¤...");
         SetButtonsInteractable(false);
-    }
-
-    void SetButtonsInteractable(bool value)
-    {
-        if (attackButton != null) attackButton.interactable = value;
-        if (defendButton != null) defendButton.interactable = value;
     }
 
     public void OnAttackButton()
     {
-        GameManager.Instance.PlayerAttack();
+        if (GameManager.Instance != null)
+            GameManager.Instance.PlayerAttack();
     }
 
     public void OnDefendButton()
     {
-        GameManager.Instance.PlayerDefend();
+        if (GameManager.Instance != null)
+            GameManager.Instance.PlayerDefend(); // Recover
     }
 
     public void ShowResult(bool playerWon)
     {
-        Show(true);                    // ÆĞ³ÎÀº º¸ÀÌ°Ô
-        SetButtonsInteractable(false); // ¹öÆ°Àº ºñÈ°¼ºÈ­
-
-        if (playerWon)
-        {
-            SetMessage("½Â¸®Çß½À´Ï´Ù! ÀûÀ» ¾²·¯¶ß·È¾î¿ä!");
-        }
-        else
-        {
-            SetMessage("ÆĞ¹èÇß½À´Ï´Ù... °ø·æÀÌ ¾²·¯Á³¾î¿ä.");
-        }
+        Show(true);
+        SetButtonsInteractable(false);
+        SetMessage(playerWon ? "ìŠ¹ë¦¬í–ˆìŠµë‹ˆë‹¤! ë³´ìŠ¤ë¥¼ ì“°ëŸ¬ëœ¨ë ¸ì–´ìš”!" : "íŒ¨ë°°í–ˆìŠµë‹ˆë‹¤... íŒŒí‹°ê°€ ì „ë©¸í–ˆì–´ìš”.");
     }
 
+    // GameManagerì—ì„œ ë²„íŠ¼ ì ê·¸ë ¤ê³  í˜¸ì¶œí•˜ëŠ” í•¨ìˆ˜
+    public void SetButtonsInteractable(bool value)
+    {
+        if (attackButton != null) attackButton.interactable = value;
+        if (defendButton != null) defendButton.interactable = value;
+    }
 }
