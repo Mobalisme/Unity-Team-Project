@@ -507,10 +507,11 @@ MonoBehaviour:
   defenseWeight: 0.5
   minDamage: 1
   playerRecoverRatio: 0.12
-  bossRecoverChance: 0.25
-  bossRecoverChanceLowHP: 0.4
-  bossRecoverMinRatio: 0.06
-  bossRecoverMaxRatio: 0.1
+  playerRecoverCapMissingRatio: 0.6
+  aoeChancePhase2: 0.3
+  aoeChancePhase3: 0.45
+  aoeMultiplier: 0.65
+  aoeMinDamage: 1
 --- !u!4 &292687206
 Transform:
   m_ObjectHideFlags: 0
