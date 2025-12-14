@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class BattleShaker : MonoBehaviour
 {
-    public float duration = 0.2f;  // 흔들리는 시간
-    public float magnitude = 10f;  // 흔들리는 세기 (픽셀)
+    public float duration = 0.2f; 
+    public float magnitude = 10f; 
 
     RectTransform rect;
     Vector3 originalPos;
@@ -43,7 +43,6 @@ public class BattleShaker : MonoBehaviour
             yield return null;
         }
 
-        // 원위치
         if (rect != null)
             rect.anchoredPosition = originalPos;
         else

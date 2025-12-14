@@ -14,6 +14,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Field.unity
     guid: a63ec465ae405404990842d740f1efc1
+  - enabled: 1
+    path: Assets/Scenes/Lake.unity
+    guid: c7e075f5e90dda64cba16ed5ddf7dafb
+  - enabled: 1
+    path: Assets/Scenes/Lake Mini Game.unity
+    guid: 2d2f853b9de75e440b82a6c667253081
+  - enabled: 1
+    path: Assets/Scenes/Field Mini map.unity
+    guid: 8c99bc66f9f998447ad51c58fcfb3955
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

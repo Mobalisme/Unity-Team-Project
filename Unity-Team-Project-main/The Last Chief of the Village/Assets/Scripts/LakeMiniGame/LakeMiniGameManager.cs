@@ -1,57 +1,84 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
+using TMPro;
 
 public class LakeMiniGameManager : MonoBehaviour
 {
     public static LakeMiniGameManager Instance;
 
-    [Header("물줄기 프리팹 설정")]
-    public GameObject obstaclePrefab;
-    public Transform spawnLeftBottom;
-    public Transform spawnRightBottom;
-    public float spawnInterval = 0.7f;
+    [Header("프리팹 설정")]
+    public GameObject obstaclePrefab;   // 물줄기 프리팹
+    public GameObject warningPrefab;    // 경고(느낌표) 프리팹
 
-    [Header("물줄기 이동 설정")]
-    public float obstacleSpeed = 3f;
+    [Header("스폰 범위 기준 Transform")]
+    public Transform spawnLeftBottom;   // 왼쪽 기준점
+    public Transform spawnRightBottom;  // 오른쪽 기준점
 
-    [Header("게임 시간 설정")]
-    public float gameDuration = 20f;   // 게임 진행 시간(초)
-    float elapsedTime;
-    bool isPlaying;
+    [Header("스폰 타이밍")]
+    public float spawnInterval = 1.2f;  // 물줄기 생성 간격
+    public float warningTime = 0.6f;    // 몇 초 전에 예고할지
 
-    [Header("플레이어 체력")]
+    [Header("중앙 금지 구간(가운데 안 나오게)")]
+    public float centerX = 0f;          // 가운데 X (필요시 조정)
+    public float centerBlockWidth = 2f; // 중앙 금지 폭
+
+    [Header("게임 시간")]
+    public float gameDuration = 30f;
+
+    [Header("UI")]
+    public TextMeshProUGUI timeText;    // 00:30 표시 텍스트
+    public TextMeshProUGUI scoreText;   // Score: 0 표시 텍스트
+
+    [Header("점수")]
+    public int score = 0;
+
+    [Header("체력(옵션)")]
     public int maxHealth = 100;
-    public int currentHealth;
+    public int currentHealth = 100;
+
+    float timeLeft;
+    bool isGameOver = false;
+
+    Coroutine spawnRoutine;
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        Instance = this;
     }
 
     void Start()
     {
-        currentHealth = maxHealth;
-        elapsedTime = 0f;
-        isPlaying = true;
-        StartCoroutine(SpawnRoutine());
+        if (currentHealth <= 0) currentHealth = maxHealth;
+
+        if (spawnInterval < warningTime + 0.05f)
+            spawnInterval = warningTime + 0.05f;
+
+        // 타이머 시작
+        timeLeft = gameDuration;
+        UpdateTimeUI();
+        UpdateHPOnScoreText();
+
+        spawnRoutine = StartCoroutine(SpawnLoop());
     }
 
     void Update()
     {
-        if (!isPlaying) return;
+        if (isGameOver) return;
 
-        elapsedTime += Time.deltaTime;
-        if (elapsedTime >= gameDuration)
+        timeLeft -= Time.deltaTime;
+        if (timeLeft < 0f) timeLeft = 0f;
+
+        UpdateTimeUI();
+
+        if (timeLeft <= 0f)
         {
-            isPlaying = false;
-            Debug.Log("Lake Game Clear! Time over");
+            EndGame();
         }
     }
 
-    IEnumerator SpawnRoutine()
+    IEnumerator SpawnLoop()
     {
-        while (isPlaying)
+        while (!isGameOver)
         {
             SpawnObstacle();
             yield return new WaitForSeconds(spawnInterval);
@@ -63,31 +90,111 @@ public class LakeMiniGameManager : MonoBehaviour
         if (obstaclePrefab == null || spawnLeftBottom == null || spawnRightBottom == null)
             return;
 
-        // 0 또는 1 중 하나 랜덤
-        int lane = Random.Range(0, 2);
+        float minX = spawnLeftBottom.position.x;
+        float maxX = spawnRightBottom.position.x;
 
-        Transform spawnPoint = (lane == 0) ? spawnLeftBottom : spawnRightBottom;
+        float leftMax = centerX - centerBlockWidth * 0.5f;
+        float rightMin = centerX + centerBlockWidth * 0.5f;
 
-        // 선택된 왼쪽 / 오른쪽 위치에서만 생성
-        Vector3 spawnPos = spawnPoint.position;
+        leftMax = Mathf.Clamp(leftMax, minX, maxX);
+        rightMin = Mathf.Clamp(rightMin, minX, maxX);
 
-        Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
+        // 중앙 금지 구간 피해서 좌/우 중 랜덤
+        float spawnX = (Random.value < 0.5f)
+            ? Random.Range(minX, leftMax)
+            : Random.Range(rightMin, maxX);
+
+        float spawnY = spawnLeftBottom.position.y;
+
+        StartCoroutine(SpawnWithWarning(new Vector3(spawnX, spawnY, 0f)));
+    }
+
+    IEnumerator SpawnWithWarning(Vector3 pos)
+    {
+        GameObject warn = null;
+
+        if (warningPrefab != null)
+        {
+            warn = Instantiate(
+                warningPrefab,
+                pos + Vector3.up * 0.10f,
+                Quaternion.identity
+            );
+
+            // 크기만 조절
+            warn.transform.localScale = Vector3.one * 0.35f;
+
+            var blink = warn.GetComponent<WarningBlink>();
+            if (blink != null)
+                blink.SetBaseScale(warn.transform.localScale);
+
+        }
+
+        yield return new WaitForSeconds(warningTime);
+
+        if (!isGameOver)
+            Instantiate(obstaclePrefab, pos, Quaternion.identity);
+
+        if (warn != null)
+            Destroy(warn);
     }
 
 
 
-    public void TakeDamage(int amount)
+    public void AddScore(int amount)
     {
-        if (!isPlaying) return;
+        if (isGameOver) return;
+        score += amount;
+        if (score < 0) score = 0;
+        UpdateScoreUI();
+    }
 
-        currentHealth -= amount;
-        Debug.Log("HP: " + currentHealth);
+    public void TakeDamage(int dmg)
+    {
+        currentHealth -= dmg;
+        if (currentHealth < 0) currentHealth = 0;
 
-        if (currentHealth <= 0)
+        UpdateHPOnScoreText();
+    }
+
+    void UpdateHPOnScoreText()
+    {
+        if (scoreText == null) return;
+        scoreText.text = $"Score: {currentHealth}";
+    }
+
+
+
+    void UpdateTimeUI()
+    {
+        if (timeText == null) return;
+
+        int sec = Mathf.CeilToInt(timeLeft);
+        timeText.text = $"00:{sec:00}";
+    }
+
+    void UpdateScoreUI()
+    {
+        if (scoreText == null) return;
+        scoreText.text = $"Score: {score}";
+    }
+
+    void EndGame()
+    {
+        isGameOver = true;
+        StopSpawning();
+        UpdateTimeUI();
+
+        Debug.Log("게임 종료!");
+        // 여기서 최종 점수 UI 패널 띄우는 것도 연결 가능
+    }
+
+    public void StopSpawning()
+    {
+        if (spawnRoutine != null)
         {
-            currentHealth = 0;
-            isPlaying = false;
-            Debug.Log("Lake Game Over! HP 0");
+            StopCoroutine(spawnRoutine);
+            spawnRoutine = null;
         }
     }
 }

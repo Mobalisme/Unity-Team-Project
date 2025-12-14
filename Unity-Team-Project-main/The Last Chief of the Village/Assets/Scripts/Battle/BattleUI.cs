@@ -1,5 +1,5 @@
 // BattleUI.cs
-// ì£¼ì„: í•œê¸€ / ê²Œì„ì— í‘œì‹œë˜ëŠ” ë¬¸ìì—´: ì˜ì–´
+// ÁÖ¼®: ÇÑ±Û / °ÔÀÓ¿¡ Ç¥½ÃµÇ´Â ¹®ÀÚ¿­: ¿µ¾î
 
 using TMPro;
 using UnityEngine;
@@ -15,7 +15,7 @@ public class BattleUI : MonoBehaviour
 
     [Header("Buttons")]
     public Button attackButton;
-    public Button defendButton; // Recover ë²„íŠ¼ìœ¼ë¡œ ì‚¬ìš©
+    public Button defendButton; // Recover ¹öÆ°À¸·Î »ç¿ë
 
     public void Show(bool active)
     {
@@ -27,7 +27,7 @@ public class BattleUI : MonoBehaviour
         if (messageText != null) messageText.text = msg;
     }
 
-    // í”Œë ˆì´ì–´ í„´(ì„ íƒ ë‹¨ê³„) í‘œì‹œ
+    // ÇÃ·¹ÀÌ¾î ÅÏ(¼±ÅÃ ´Ü°è) Ç¥½Ã
     public void ShowPlayerTurn()
     {
         Show(true);
@@ -35,7 +35,7 @@ public class BattleUI : MonoBehaviour
         SetButtonsInteractable(true);
     }
 
-    // ì  í„´ í‘œì‹œ(ë²„íŠ¼ ì ê¸ˆ)
+    // Àû ÅÏ Ç¥½Ã(¹öÆ° Àá±İ)
     public void ShowEnemyTurn()
     {
         Show(true);
@@ -43,21 +43,21 @@ public class BattleUI : MonoBehaviour
         SetButtonsInteractable(false);
     }
 
-    // Attack ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ(Inspector OnClickì— ì—°ê²°)
+    // Attack ¹öÆ° Å¬¸¯ ½Ã È£Ãâ(Inspector OnClick¿¡ ¿¬°á)
     public void OnAttackButton()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.PlayerAttack();
     }
 
-    // Recover ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ(Inspector OnClickì— ì—°ê²°)
+    // Recover ¹öÆ° Å¬¸¯ ½Ã È£Ãâ(Inspector OnClick¿¡ ¿¬°á)
     public void OnDefendButton()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.PlayerDefend();
     }
 
-    // ìŠ¹íŒ¨ í‘œì‹œ
+    // ½ÂÆĞ Ç¥½Ã
     public void ShowResult(bool playerWon)
     {
         Show(true);
@@ -65,7 +65,7 @@ public class BattleUI : MonoBehaviour
         SetMessage(playerWon ? "Victory! The boss is defeated!" : "Defeat... Your party is wiped out.");
     }
 
-    // GameManagerì—ì„œ ì…ë ¥ì„ ì ê·¸ê¸° ìœ„í•´ í˜¸ì¶œ
+    // GameManager¿¡¼­ ÀÔ·ÂÀ» Àá±×±â À§ÇØ È£Ãâ
     public void SetButtonsInteractable(bool value)
     {
         if (attackButton != null) attackButton.interactable = value;
