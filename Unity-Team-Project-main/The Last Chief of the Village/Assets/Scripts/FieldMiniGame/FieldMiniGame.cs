@@ -1,51 +1,70 @@
+// FieldMiniGame.cs
+// ì£¼ì„: í•œê¸€ / ê²Œì„ì— í‘œì‹œë˜ëŠ” ë¬¸ìì—´: ì˜ì–´
+
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class FieldMiniGame : MonoBehaviour
 {
     public static FieldMiniGame Instance;
 
-    [Header("ÇÁ¸®ÆÕ (3Á¾)")]
+    [Header("í”„ë¦¬íŒ¹ (3ì¢…)")]
     public GameObject applePrefab;
     public GameObject grapePrefab;
     public GameObject bombPrefab;
 
-    [Header("½ºÆù À§Ä¡")]
+    [Header("ìŠ¤í° ìœ„ì¹˜")]
     public Transform spawnLeftTop;
     public Transform spawnRightTop;
     public float spawnInterval = 0.7f;
 
-    [Header("½ºÆù °¡ÁßÄ¡")]
+    [Header("ìŠ¤í° ê°€ì¤‘ì¹˜")]
     public int appleWeight = 45;
     public int grapeWeight = 20;
     public int bombWeight = 35;
 
-    [Header("°ÔÀÓ ½Ã°£")]
+    [Header("ê²Œì„ ì‹œê°„")]
     public float gameDuration = 30f;
 
     Color timeNormalColor = Color.white;
-
 
     [Header("UI")]
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timeText;
 
-    [Header("ÆøÅº È¿°ú - È­¸é Èçµé¸²")]
-    public Camera targetCamera;            
+    [Header("í­íƒ„ íš¨ê³¼ - í™”ë©´ í”ë“¤ë¦¼")]
+    public Camera targetCamera;
     public float shakeDuration = 0.18f;
-    public float shakeStrength = 0.08f; // Èçµé¸² Å©±â
+    public float shakeStrength = 0.08f;
 
-    [Header("Ä«¸Ş¶ó °æ°è (Shake¿¡µµ Àû¿ë)")]
-    public Vector2 camMinBounds;   // ¿¹: (-5, -3)
-    public Vector2 camMaxBounds;   // ¿¹: ( 5,  3)
+    [Header("ì¹´ë©”ë¼ ê²½ê³„ (Shakeì—ë„ ì ìš©)")]
+    public Vector2 camMinBounds;
+    public Vector2 camMaxBounds;
 
+    [Header("Tier Popup UI (Dino02)")]
+    public Image tierPopupImage;    // Canvasì˜ UI Image
+    public Sprite highSprite;       // Dino02_01
+    public Sprite midSprite;        // Dino02_02
+    public Sprite lowSprite;        // Dino02_03
+    public Vector2 popupSize = new Vector2(900, 450);
+    public float popupSeconds = 1.2f;
+
+    [Header("Scene Flow (Optional)")]
+    public bool loadNextSceneAfterPopup = false;
+    public string nextSceneName = "Battle";
 
     float gameTimer;
     float spawnTimer;
     bool isPlaying;
+    bool ended = false;
 
     Coroutine shakeCo;
+
+    [Header("ì ìˆ˜")]
+    public int score = 0;
 
     private void Awake()
     {
@@ -55,6 +74,9 @@ public class FieldMiniGame : MonoBehaviour
     private void Start()
     {
         StartGame();
+
+        if (tierPopupImage != null)
+            tierPopupImage.gameObject.SetActive(false);
     }
 
     public void StartGame()
@@ -62,6 +84,7 @@ public class FieldMiniGame : MonoBehaviour
         gameTimer = gameDuration;
         spawnTimer = 0f;
         isPlaying = true;
+        ended = false;
 
         score = 0;
         RefreshScoreUI();
@@ -69,32 +92,22 @@ public class FieldMiniGame : MonoBehaviour
 
         if (timeText != null)
             timeNormalColor = timeText.color;
-
     }
-
-    [Header("Á¡¼ö")]
-    public int score = 0;
 
     private void Update()
     {
         if (!isPlaying) return;
 
-        // Å¸ÀÌ¸Ó
         gameTimer -= Time.deltaTime;
         if (gameTimer <= 0f)
         {
             gameTimer = 0f;
             isPlaying = false;
             RefreshTimeUI();
-
-            Debug.Log("Game Over! Final Score = " + score);
-
-            // °ÔÀÓ ³¡³ª¸é È­¸é¿¡ ÀÖ´Â ¾ÆÀÌÅÛ ÀüºÎ »èÁ¦
-            ClearAllItems();
+            EndGame();
             return;
         }
 
-        // ½ºÆù
         spawnTimer -= Time.deltaTime;
         if (spawnTimer <= 0f)
         {
@@ -155,16 +168,58 @@ public class FieldMiniGame : MonoBehaviour
         timeText.text = $"{minutes:00}:{seconds:00}";
     }
 
+    void EndGame()
+    {
+        if (ended) return;
+        ended = true;
+
+        // í™”ë©´ ì•„ì´í…œ ì‚­ì œ
+        ClearAllItems();
+
+        // Field: ì ìˆ˜(0~100 clamp)ë¡œ í‹°ì–´ íŒì •
+        int finalScore = MiniGameProgress.ClampScore100(score);
+        MiniGameProgress.SetFieldResult(finalScore);
+
+        StartCoroutine(EndFlow(finalScore));
+    }
+
+    IEnumerator EndFlow(int finalScore)
+    {
+        yield return ShowTierPopup(MiniGameProgress.ScoreToTier(finalScore));
+
+        if (loadNextSceneAfterPopup && !string.IsNullOrEmpty(nextSceneName))
+            SceneManager.LoadScene(nextSceneName);
+    }
+
+    IEnumerator ShowTierPopup(MiniGameProgress.Tier123 tier)
+    {
+        if (tierPopupImage == null) yield break;
+
+        tierPopupImage.gameObject.SetActive(true);
+        tierPopupImage.preserveAspect = true;
+
+        Sprite s = null;
+        if (tier == MiniGameProgress.Tier123.High_3) s = highSprite;
+        else if (tier == MiniGameProgress.Tier123.Mid_2) s = midSprite;
+        else s = lowSprite;
+
+        if (s != null) tierPopupImage.sprite = s;
+
+        tierPopupImage.rectTransform.anchoredPosition = Vector2.zero;
+        tierPopupImage.rectTransform.sizeDelta = popupSize;
+
+        yield return new WaitForSeconds(popupSeconds);
+        tierPopupImage.gameObject.SetActive(false);
+    }
 
     void ClearAllItems()
     {
         var items = Object.FindObjectsByType<FallingItem>(FindObjectsSortMode.None);
         foreach (var it in items)
             Destroy(it.gameObject);
-
     }
 
-    // ÆøÅº È¿°ú: Ä«¸Ş¶ó Èçµé±â
+    // í­íƒ„ íš¨ê³¼: ì¹´ë©”ë¼ í”ë“¤ê¸°
     public void ShakeCamera()
     {
         Camera cam = targetCamera != null ? targetCamera : Camera.main;
@@ -186,20 +241,16 @@ public class FieldMiniGame : MonoBehaviour
             Vector2 offset = Random.insideUnitCircle * shakeStrength;
             Vector3 pos = origin + new Vector3(offset.x, offset.y, 0f);
 
-            // Clamp Àû¿ë (x, y¸¸)
             pos.x = Mathf.Clamp(pos.x, camMinBounds.x, camMaxBounds.x);
             pos.y = Mathf.Clamp(pos.y, camMinBounds.y, camMaxBounds.y);
 
             cam.transform.position = pos;
-
             yield return null;
         }
 
-        // ¸¶Áö¸·¿¡µµ Clamp ÇÑ ¹ø ´õ
         Vector3 finalPos = origin;
         finalPos.x = Mathf.Clamp(finalPos.x, camMinBounds.x, camMaxBounds.x);
         finalPos.y = Mathf.Clamp(finalPos.y, camMinBounds.y, camMaxBounds.y);
         cam.transform.position = finalPos;
     }
-
 }

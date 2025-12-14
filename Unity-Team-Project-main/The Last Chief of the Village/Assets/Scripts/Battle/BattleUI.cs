@@ -1,5 +1,5 @@
 // BattleUI.cs
-// ÁÖ¼®: ÇÑ±Û / °ÔÀÓ¿¡ Ç¥½ÃµÇ´Â ¹®ÀÚ¿­: ¿µ¾î
+// ì£¼ì„: í•œê¸€ / ê²Œì„ì— í‘œì‹œë˜ëŠ” ë¬¸ìì—´: ì˜ì–´
 
 using TMPro;
 using UnityEngine;
@@ -15,7 +15,7 @@ public class BattleUI : MonoBehaviour
 
     [Header("Buttons")]
     public Button attackButton;
-    public Button defendButton; // Recover ¹öÆ°À¸·Î »ç¿ë
+    public Button defendButton; // Recover ë²„íŠ¼ìœ¼ë¡œ ì‚¬ìš©
 
     public void Show(bool active)
     {
@@ -27,7 +27,6 @@ public class BattleUI : MonoBehaviour
         if (messageText != null) messageText.text = msg;
     }
 
-    // ÇÃ·¹ÀÌ¾î ÅÏ(¼±ÅÃ ´Ü°è) Ç¥½Ã
     public void ShowPlayerTurn()
     {
         Show(true);
@@ -35,7 +34,6 @@ public class BattleUI : MonoBehaviour
         SetButtonsInteractable(true);
     }
 
-    // Àû ÅÏ Ç¥½Ã(¹öÆ° Àá±İ)
     public void ShowEnemyTurn()
     {
         Show(true);
@@ -43,21 +41,18 @@ public class BattleUI : MonoBehaviour
         SetButtonsInteractable(false);
     }
 
-    // Attack ¹öÆ° Å¬¸¯ ½Ã È£Ãâ(Inspector OnClick¿¡ ¿¬°á)
     public void OnAttackButton()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.PlayerAttack();
     }
 
-    // Recover ¹öÆ° Å¬¸¯ ½Ã È£Ãâ(Inspector OnClick¿¡ ¿¬°á)
     public void OnDefendButton()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.PlayerDefend();
     }
 
-    // ½ÂÆĞ Ç¥½Ã
     public void ShowResult(bool playerWon)
     {
         Show(true);
@@ -65,10 +60,21 @@ public class BattleUI : MonoBehaviour
         SetMessage(playerWon ? "Victory! The boss is defeated!" : "Defeat... Your party is wiped out.");
     }
 
-    // GameManager¿¡¼­ ÀÔ·ÂÀ» Àá±×±â À§ÇØ È£Ãâ
     public void SetButtonsInteractable(bool value)
     {
         if (attackButton != null) attackButton.interactable = value;
         if (defendButton != null) defendButton.interactable = value;
+    }
+
+    // ===== (ì¶”ê°€) êµ¬ë²„ì „ GameManager í˜¸í™˜ìš© =====
+    public void RefreshAll()
+    {
+        // êµ¬ë²„ì „ ì½”ë“œê°€ í˜¸ì¶œí•´ë„ ì—ëŸ¬ ì•ˆ ë‚˜ê²Œë§Œ ì²˜ë¦¬
+        // ì‹¤ì œ UI ê°±ì‹ ì€ GameManagerê°€ HUD í…ìŠ¤íŠ¸ë¥¼ ê°±ì‹ í•˜ëŠ” êµ¬ì¡°ë¡œ ì´ë¯¸ ë˜ì–´ìˆìŒ
+    }
+
+    public void SetBossPhase(int phase)
+    {
+        // êµ¬ë²„ì „ ì½”ë“œê°€ í˜¸ì¶œí•´ë„ ì—ëŸ¬ ì•ˆ ë‚˜ê²Œë§Œ ì²˜ë¦¬
     }
 }

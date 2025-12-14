@@ -1,2 +1,21 @@
 fileFormatVersion: 2
 guid: 7371e72e43c89f0448554d1c073e7a37
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - obstaclePrefab: {instanceID: 0}
+  - warningPrefab: {instanceID: 0}
+  - spawnLeftBottom: {instanceID: 0}
+  - spawnRightBottom: {instanceID: 0}
+  - timeText: {instanceID: 0}
+  - scoreText: {instanceID: 0}
+  - tierPopupImage: {instanceID: 0}
+  - highSprite: {instanceID: 0}
+  - midSprite: {instanceID: 0}
+  - lowSprite: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

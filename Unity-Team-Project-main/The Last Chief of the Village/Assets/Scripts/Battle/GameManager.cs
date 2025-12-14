@@ -1,5 +1,5 @@
 // GameManager.cs
-// ÁÖ¼®: ÇÑ±Û / °ÔÀÓ¿¡ Ç¥½ÃµÇ´Â ¹®ÀÚ¿­: ¿µ¾î
+// ì£¼ì„: í•œê¸€ / ê²Œì„ì— í‘œì‹œë˜ëŠ” ë¬¸ìì—´: ì˜ì–´
 
 using System.Collections;
 using System.Collections.Generic;
@@ -11,44 +11,44 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    // ===================== UI ¿¬°á =====================
+    // ===================== UI ì—°ê²° =====================
     [Header("UI")]
     public BattleUI battleUI;
-    public TMP_Text playerHPText;   // PlayerHPText
-    public TMP_Text enemyHPText;    // EnemyHPText
+    public TMP_Text playerHPText;
+    public TMP_Text enemyHPText;
 
     [Header("Party Icons (Canvas: PlayerDino / PlayerDino2 / PlayerDino3)")]
-    public Image playerDinoIcon1;   // PlayerDino
-    public Image playerDinoIcon2;   // PlayerDino2
-    public Image playerDinoIcon3;   // PlayerDino3
+    public Image playerDinoIcon1;
+    public Image playerDinoIcon2;
+    public Image playerDinoIcon3;
 
     [Header("Hit Shake (Optional)")]
     public BattleShaker playerShaker;
     public BattleShaker enemyShaker;
 
-    // ===================== Æ¼¾î(ÇÏ=1, Áß=2, »ó=3) =====================
-    // ÁÖÀÇ: PlayerDino1(Starter)´Â °íÁ¤ ½ºÅÈÀÌ¹Ç·Î Æ¼¾î Àû¿ë ¾È ÇÔ
+    // ===================== í‹°ì–´ ì„¤ì • =====================
+    // ì£¼ì˜: PlayerDino1(Starter)ëŠ” ê³ ì • ìŠ¤íƒ¯ì´ë¯€ë¡œ í‹°ì–´ ì ìš© ì•ˆ í•¨
     public enum Tier123 { Low_1 = 1, Mid_2 = 2, High_3 = 3 }
 
     [Header("Player Dino Tiers (Inspector)")]
     [Tooltip("PlayerDino1 = Starter (fixed stats). Tier is not applied.")]
     public Tier123 playerDino1Tier = Tier123.High_3;
 
-    [Tooltip("PlayerDino2 = Attacker tier")]
+    [Tooltip("PlayerDino2 = Attacker tier (Field mini game result)")]
     public Tier123 playerDino2Tier = Tier123.Mid_2;
 
-    [Tooltip("PlayerDino3 = Tank tier")]
+    [Tooltip("PlayerDino3 = Tank tier (Lake mini game result)")]
     public Tier123 playerDino3Tier = Tier123.Mid_2;
 
-    // ===================== º¸½º(°íÁ¤ ½ºÆå) =====================
+    // ===================== ë³´ìŠ¤(ê³ ì • ìŠ¤í™) =====================
     [Header("Boss (Fixed Spec)")]
     public int bossMaxHP = 450;
 
-    // ÆäÀÌÁî ±âÁØ(HP ºñÀ²): 1Æä > 66.7%, 2Æä > 33.3%, ±× ¿Ü 3Æä
+    // í˜ì´ì¦ˆ ê¸°ì¤€(HP ë¹„ìœ¨): 1í˜ > 66.7%, 2í˜ > 33.3%, ê·¸ ì™¸ 3í˜
     private const float PHASE1_MIN = 2f / 3f;
     private const float PHASE2_MIN = 1f / 3f;
 
-    // ===================== µ¥¹ÌÁö/È¸º¹ ¹ë·±½º =====================
+    // ===================== ë°ë¯¸ì§€/íšŒë³µ ë°¸ëŸ°ìŠ¤ =====================
     [Header("Damage Formula")]
     [Tooltip("damage = atk - def * defenseWeight (minDamage+)")]
     [Range(0f, 1.5f)] public float defenseWeight = 0.5f;
@@ -57,23 +57,17 @@ public class GameManager : MonoBehaviour
     [Header("Player Recover")]
     [Tooltip("Recover heals only dinos who selected Recover: maxHP * ratio")]
     [Range(0.05f, 0.25f)] public float playerRecoverRatio = 0.10f;
-
-    [Tooltip("Recover heal is capped by missingHP * capRatio to prevent balance break")]
+    [Tooltip("Recover heal capped by missingHP * capRatio (prevents full-heal abuse)")]
     [Range(0.2f, 1.0f)] public float playerRecoverCapMissingRatio = 0.60f;
 
     [Header("Boss AoE (Phase2+)")]
-    [Tooltip("AoE chance in Phase 2")]
+    [Tooltip("Phase2+: chance to hit all party members (scaled by aoeMultiplier)")]
     [Range(0f, 1f)] public float aoeChancePhase2 = 0.30f;
-
-    [Tooltip("AoE chance in Phase 3")]
     [Range(0f, 1f)] public float aoeChancePhase3 = 0.45f;
-
-    [Tooltip("AoE damage multiplier vs single-hit damage (recommended 0.55~0.75)")]
     [Range(0.30f, 1.00f)] public float aoeMultiplier = 0.65f;
-
     public int aoeMinDamage = 1;
 
-    // ===================== ·±Å¸ÀÓ µ¥ÀÌÅÍ =====================
+    // ===================== ë‚´ë¶€ ëª¨ë¸ =====================
     private class Dino
     {
         public string name;
@@ -93,24 +87,20 @@ public class GameManager : MonoBehaviour
     private readonly List<Dino> party = new List<Dino>(3);
     private Dino boss;
 
-    // º¸½º ÆäÀÌÁî´Â ¡°¿Ã¶ó°¡±â¸¸¡±(È¸º¹/Æ¯¼ö »óÈ²¿¡µµ ÆäÀÌÁî°¡ ³»·Á°¡Áö ¾Ê°Ô)
     private int bossPhase = 1;
 
-    // ===================== ÇÃ·¹ÀÌ¾î ÅÏ: 3¸¶¸® °¢°¢ Çàµ¿ ¼±ÅÃ ÈÄ ÀÏ°ı ½ÇÇà =====================
     private enum TurnState { Planning, Resolving, BossActing, Ended }
     private TurnState state = TurnState.Planning;
 
     private enum ActionType { Attack, Recover }
     private readonly ActionType[] plannedActions = new ActionType[3];
-    private readonly bool[] actionLocked = new bool[3]; // Á×Àº °ø·æÀº ½ºÅµ¿ë
+    private readonly bool[] actionLocked = new bool[3];
     private int planningIndex = 0;
 
-    // ===================== ¾ÆÀÌÄÜ °­Á¶(¼±ÅÃ/½ÇÇà/ÇÇ°İ Ç¥½Ã) =====================
     private Image[] partyIcons;
     private Vector3[] iconBaseScale;
     private int focusIndex = -1;
 
-    // ===================== Unity =====================
     private void Awake()
     {
         Instance = this;
@@ -118,31 +108,39 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // ë‘ ë¯¸ë‹ˆê²Œì„(Field/Lake) ê²°ê³¼ë¥¼ ë¡œë“œí•˜ê³ , ìˆìœ¼ë©´ í‹°ì–´ë¥¼ ë®ì–´ì”€
+        MiniGameProgress.Load();
+
+        if (MiniGameProgress.TryGetFieldTier(out int fieldTier))
+            playerDino2Tier = (Tier123)fieldTier;   // Field -> Dino2(Attacker)
+
+        if (MiniGameProgress.TryGetLakeTier(out int lakeTier))
+            playerDino3Tier = (Tier123)lakeTier;    // Lake  -> Dino3(Tank)
+
         BuildParty();
         StartPlayerPlanning();
     }
 
-    // ===================== ÆÄÆ¼ ±¸¼º(¿ä±¸ ½ºÅÈ ±×´ë·Î) =====================
+    // ===================== íŒŒí‹° êµ¬ì„±(ìš”êµ¬ ìŠ¤íƒ¯ ê·¸ëŒ€ë¡œ) =====================
     private void BuildParty()
     {
         party.Clear();
 
-        // PlayerDino1: ½ºÅ¸ÅÍ °íÁ¤
+        // PlayerDino1: ìŠ¤íƒ€í„° ê³ ì •
         party.Add(new Dino("Starter", 150, 24, 22));
 
-        // PlayerDino2: °ø°İÇü(µô·¯) Æ¼¾î
+        // PlayerDino2: ê³µê²©í˜•(ë”œëŸ¬) í‹°ì–´ (Field ê²°ê³¼)
         party.Add(CreateAttacker((int)playerDino2Tier));
 
-        // PlayerDino3: ¹æ¾îÇü(ÅÊÄ¿) Æ¼¾î
+        // PlayerDino3: ë°©ì–´í˜•(íƒ±ì»¤) í‹°ì–´ (Lake ê²°ê³¼)
         party.Add(CreateTank((int)playerDino3Tier));
 
-        // º¸½º
+        // ë³´ìŠ¤
         boss = new Dino("Boss", bossMaxHP, 0, 0);
 
         bossPhase = 1;
         RefreshBossPhaseUpOnly();
 
-        // ¾ÆÀÌÄÜ ¹è¿­
         partyIcons = new Image[3] { playerDinoIcon1, playerDinoIcon2, playerDinoIcon3 };
         iconBaseScale = new Vector3[3];
         for (int i = 0; i < 3; i++)
@@ -155,7 +153,8 @@ public class GameManager : MonoBehaviour
         UpdatePartyIcons();
     }
 
-    private Dino CreateAttacker(int tier) // 1=ÇÏ,2=Áß,3=»ó
+    // Field ìŠ¤íƒ¯(ìš”êµ¬ì¹˜): High 155/32/18, Mid 145/28/16, Low 135/24/14
+    private Dino CreateAttacker(int tier)
     {
         tier = Mathf.Clamp(tier, 1, 3);
         if (tier == 3) return new Dino("Attacker(3)", 155, 32, 18);
@@ -163,7 +162,8 @@ public class GameManager : MonoBehaviour
         return new Dino("Attacker(1)", 135, 24, 14);
     }
 
-    private Dino CreateTank(int tier) // 1=ÇÏ,2=Áß,3=»ó
+    // Lake ìŠ¤íƒ¯(ìš”êµ¬ì¹˜): High 210/22/32, Mid 195/20/28, Low 180/18/25
+    private Dino CreateTank(int tier)
     {
         tier = Mathf.Clamp(tier, 1, 3);
         if (tier == 3) return new Dino("Tank(3)", 210, 22, 32);
@@ -171,7 +171,7 @@ public class GameManager : MonoBehaviour
         return new Dino("Tank(1)", 180, 18, 25);
     }
 
-    // ===================== ÇÃ·¹ÀÌ¾î ÅÏ ½ÃÀÛ: 1¡æ2¡æ3 Çàµ¿ ¼±ÅÃ =====================
+    // ===================== í„´ ì‹œì‘(í”Œë˜ë‹) =====================
     private void StartPlayerPlanning()
     {
         if (boss.Dead) { EndBattle(true); return; }
@@ -181,11 +181,10 @@ public class GameManager : MonoBehaviour
         planningIndex = 0;
         focusIndex = -1;
 
-        // ±âº»°ª: ÀüºÎ Attack
         for (int i = 0; i < 3; i++)
         {
             plannedActions[i] = ActionType.Attack;
-            actionLocked[i] = party[i].Dead; // Á×Àº °ø·æÀº ¼±ÅÃ ºÒ°¡(ÀÚµ¿ ½ºÅµ)
+            actionLocked[i] = party[i].Dead;
         }
 
         if (battleUI != null)
@@ -199,7 +198,6 @@ public class GameManager : MonoBehaviour
         UpdatePartyIcons();
     }
 
-    // ´ÙÀ½ ¼±ÅÃ °¡´ÉÇÑ °ø·æÀ¸·Î ÀÌµ¿(Á×Àº °ø·æ ½ºÅµ)
     private void AdvanceToNextSelectable()
     {
         while (planningIndex < 3 && actionLocked[planningIndex])
@@ -207,7 +205,6 @@ public class GameManager : MonoBehaviour
 
         if (planningIndex >= 3)
         {
-            // 3¸¶¸® ¸ğµÎ ¼±ÅÃ ¿Ï·á ¡æ ÅÏ ½ÇÇà
             StartCoroutine(ResolvePlayerTurnFlow());
             return;
         }
@@ -219,14 +216,13 @@ public class GameManager : MonoBehaviour
             battleUI.SetMessage(GetPlanningMessageEnglish());
     }
 
-    // °ÔÀÓ¿¡ Ç¥½ÃµÇ´Â ¹®±¸(¿µ¾î)
     private string GetPlanningMessageEnglish()
     {
         return $"{party[planningIndex].name}: choose action (Attack / Recover)\n" +
                $"Plan: 1[{plannedActions[0]}] 2[{plannedActions[1]}] 3[{plannedActions[2]}]";
     }
 
-    // ===================== ¹öÆ° ÀÔ·Â(¼±ÅÃ ´Ü°è¿¡¼­¸¸ µ¿ÀÛ) =====================
+    // ===================== ë²„íŠ¼ ì…ë ¥ =====================
     public void PlayerAttack()
     {
         if (state != TurnState.Planning) return;
@@ -237,7 +233,7 @@ public class GameManager : MonoBehaviour
         AdvanceToNextSelectable();
     }
 
-    public void PlayerDefend() // Recover
+    public void PlayerDefend()
     {
         if (state != TurnState.Planning) return;
         if (planningIndex < 0 || planningIndex >= 3) return;
@@ -247,7 +243,7 @@ public class GameManager : MonoBehaviour
         AdvanceToNextSelectable();
     }
 
-    // ===================== ÇÃ·¹ÀÌ¾î ÅÏ ½ÇÇà(¼±ÅÃ ÈÄ ÀÏ°ı ½ÇÇà) =====================
+    // ===================== í”Œë ˆì´ì–´ í„´ ì²˜ë¦¬ =====================
     private IEnumerator ResolvePlayerTurnFlow()
     {
         state = TurnState.Resolving;
@@ -260,7 +256,7 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.25f);
 
-        // 1) Recover ¸ÕÀú Ã³¸®(È¸º¹ ¼±ÅÃÇÑ °ø·æ¸¸)
+        // Recover ë¨¼ì € ì²˜ë¦¬
         for (int i = 0; i < 3; i++)
         {
             if (party[i].Dead) continue;
@@ -281,7 +277,7 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.45f);
         }
 
-        // 2) Attack Ã³¸®(°ø°İ ¼±ÅÃÇÑ °ø·æ¸¸)
+        // Attack ì²˜ë¦¬
         for (int i = 0; i < 3; i++)
         {
             if (party[i].Dead) continue;
@@ -295,7 +291,6 @@ public class GameManager : MonoBehaviour
 
             if (enemyShaker != null) enemyShaker.Shake();
 
-            // HP°¡ ³»·Á°¡¸é ÆäÀÌÁî°¡ ¿Ã¶ó°¥ ¼ö ÀÖÀ½
             RefreshBossPhaseUpOnly();
 
             if (battleUI != null)
@@ -318,17 +313,13 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        // 3) º¸½º Çàµ¿
         StartCoroutine(BossTurnFlow());
     }
 
-    // ÇÃ·¹ÀÌ¾î È¸º¹·® °è»ê(¹ë·±½º°¡ ±úÁöÁö ¾Êµµ·Ï Á¦ÇÑ Æ÷ÇÔ)
     private int ComputePlayerHeal(Dino d)
     {
-        // ±âº» È¸º¹: maxHP * playerRecoverRatio
         int heal = Mathf.CeilToInt(d.maxHP * playerRecoverRatio);
 
-        // °úµµ È¸º¹ Á¦ÇÑ: missingHP * capRatio
         int missing = d.maxHP - d.hp;
         int cap = Mathf.CeilToInt(missing * playerRecoverCapMissingRatio);
 
@@ -336,7 +327,7 @@ public class GameManager : MonoBehaviour
         return Mathf.Max(1, heal);
     }
 
-    // ===================== º¸½º ÅÏ(2ÆäºÎÅÍ È®·üÀûÀ¸·Î ´ÜÃ¼°ø°İ) =====================
+    // ===================== ë³´ìŠ¤ í„´ ì²˜ë¦¬ =====================
     private IEnumerator BossTurnFlow()
     {
         state = TurnState.BossActing;
@@ -360,7 +351,6 @@ public class GameManager : MonoBehaviour
 
             int bossAtk = GetBossAttack();
 
-            // ´ÜÃ¼ °ø°İ: »ì¾ÆÀÖ´Â 3¸¶¸® ¸ğµÎ¿¡°Ô °¨¼ÒµÈ µ¥¹ÌÁö
             for (int i = 0; i < 3; i++)
             {
                 if (party[i].Dead) continue;
@@ -388,7 +378,6 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // ´ÜÀÏ °ø°İ: ·£´ı »ıÁ¸ ´ë»ó 1¸í
             int target = FindRandomAliveIndex();
             if (target == -1) { EndBattle(false); yield break; }
 
@@ -412,7 +401,6 @@ public class GameManager : MonoBehaviour
             if (AllPartyDead()) { EndBattle(false); yield break; }
         }
 
-        // ´ÙÀ½ ÅÏ: ´Ù½Ã 1¡æ2¡æ3 Çàµ¿ ¼±ÅÃ
         if (battleUI != null)
         {
             battleUI.Show(true);
@@ -422,21 +410,19 @@ public class GameManager : MonoBehaviour
         StartPlayerPlanning();
     }
 
-    // º¸½º AoE »ç¿ë ¿©ºÎ(2ÆäºÎÅÍ È®·ü)
     private bool ShouldBossUseAoe()
     {
         if (bossPhase < 2) return false;
 
         float chance = (bossPhase == 2) ? aoeChancePhase2 : aoeChancePhase3;
 
-        // »ıÁ¸ °ø·æÀÌ 1¸¶¸®¸é AoE ÀÇ¹Ì°¡ ÀûÀ¸´Ï È®·ü ³·Ãã
         int alive = CountAlive();
         if (alive <= 1) chance *= 0.10f;
 
         return Random.value < chance;
     }
 
-    // ===================== º¸½º ÆäÀÌÁî(Up-only) =====================
+    // ===================== ë³´ìŠ¤ í˜ì´ì¦ˆ/ìŠ¤íƒ¯ =====================
     private void RefreshBossPhaseUpOnly()
     {
         int computed = ComputeBossPhaseByRatio();
@@ -465,7 +451,7 @@ public class GameManager : MonoBehaviour
         return 20;
     }
 
-    // ===================== °øÅë: µ¥¹ÌÁö/Ã¼Å© =====================
+    // ===================== ë°ë¯¸ì§€ ê³„ì‚° =====================
     private int ComputeDamage(int atk, int def, int min)
     {
         float raw = atk - def * defenseWeight;
@@ -479,6 +465,7 @@ public class GameManager : MonoBehaviour
         if (target.hp < 0) target.hp = 0;
     }
 
+    // ===================== ìœ í‹¸ =====================
     private bool AllPartyDead()
     {
         for (int i = 0; i < 3; i++)
@@ -504,7 +491,7 @@ public class GameManager : MonoBehaviour
         return alive[Random.Range(0, alive.Count)];
     }
 
-    // ===================== HUD / ¾ÆÀÌÄÜ Ç¥½Ã =====================
+    // ===================== HUD/ì•„ì´ì½˜ ê°±ì‹  =====================
     private void UpdateHUD()
     {
         if (playerHPText != null)
@@ -532,12 +519,12 @@ public class GameManager : MonoBehaviour
             Image img = partyIcons[i];
             if (img == null) continue;
 
-            // Á×Àº °ø·æÀº ¹İÅõ¸í Ã³¸®
+            // ì£½ì€ ê³µë£¡ì€ ë°˜íˆ¬ëª… ì²˜ë¦¬
             Color c = img.color;
             c.a = party[i].Dead ? 0.25f : 1f;
             img.color = c;
 
-            // ÇöÀç ¼±ÅÃ/½ÇÇà/ÇÇ°İ ´ë»ó °­Á¶
+            // í˜„ì¬ ì„ íƒ/ì‹¤í–‰/í”¼ê²© ëŒ€ìƒ ê°•ì¡°
             if (iconBaseScale != null && iconBaseScale.Length == 3)
             {
                 if (!party[i].Dead && i == focusIndex)
@@ -548,7 +535,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ===================== Á¾·á =====================
+    // ===================== ì¢…ë£Œ =====================
     private void EndBattle(bool playerWon)
     {
         state = TurnState.Ended;

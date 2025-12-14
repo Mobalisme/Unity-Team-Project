@@ -1,40 +1,57 @@
+// LakeMiniGameManager.cs
+// ì£¼ì„: í•œê¸€ / ê²Œì„ì— í‘œì‹œë˜ëŠ” ë¬¸ìì—´: ì˜ì–´
+
 using System.Collections;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LakeMiniGameManager : MonoBehaviour
 {
     public static LakeMiniGameManager Instance;
 
-    [Header("ÇÁ¸®ÆÕ ¼³Á¤")]
-    public GameObject obstaclePrefab;   // ¹°ÁÙ±â ÇÁ¸®ÆÕ
-    public GameObject warningPrefab;    // °æ°í(´À³¦Ç¥) ÇÁ¸®ÆÕ
+    [Header("í”„ë¦¬íŒ¹ ì„¤ì •")]
+    public GameObject obstaclePrefab;   // ë¬¼ì¤„ê¸° í”„ë¦¬íŒ¹
+    public GameObject warningPrefab;    // ê²½ê³ (ëŠë‚Œí‘œ) í”„ë¦¬íŒ¹
 
-    [Header("½ºÆù ¹üÀ§ ±âÁØ Transform")]
-    public Transform spawnLeftBottom;   // ¿ŞÂÊ ±âÁØÁ¡
-    public Transform spawnRightBottom;  // ¿À¸¥ÂÊ ±âÁØÁ¡
+    [Header("ìŠ¤í° ë²”ìœ„ ê¸°ì¤€ Transform")]
+    public Transform spawnLeftBottom;   // ì™¼ìª½ ê¸°ì¤€ì 
+    public Transform spawnRightBottom;  // ì˜¤ë¥¸ìª½ ê¸°ì¤€ì 
 
-    [Header("½ºÆù Å¸ÀÌ¹Ö")]
-    public float spawnInterval = 1.2f;  // ¹°ÁÙ±â »ı¼º °£°İ
-    public float warningTime = 0.6f;    // ¸î ÃÊ Àü¿¡ ¿¹°íÇÒÁö
+    [Header("ìŠ¤í° íƒ€ì´ë°")]
+    public float spawnInterval = 1.2f;  // ë¬¼ì¤„ê¸° ìƒì„± ê°„ê²©
+    public float warningTime = 0.6f;    // ëª‡ ì´ˆ ì „ì— ì˜ˆê³ í• ì§€
 
-    [Header("Áß¾Ó ±İÁö ±¸°£(°¡¿îµ¥ ¾È ³ª¿À°Ô)")]
-    public float centerX = 0f;          // °¡¿îµ¥ X (ÇÊ¿ä½Ã Á¶Á¤)
-    public float centerBlockWidth = 2f; // Áß¾Ó ±İÁö Æø
+    [Header("ì¤‘ì•™ ê¸ˆì§€ êµ¬ê°„(ê°€ìš´ë° ì•ˆ ë‚˜ì˜¤ê²Œ)")]
+    public float centerX = 0f;          // ê°€ìš´ë° X (í•„ìš”ì‹œ ì¡°ì •)
+    public float centerBlockWidth = 2f; // ì¤‘ì•™ ê¸ˆì§€ í­
 
-    [Header("°ÔÀÓ ½Ã°£")]
+    [Header("ê²Œì„ ì‹œê°„")]
     public float gameDuration = 30f;
 
     [Header("UI")]
-    public TextMeshProUGUI timeText;    // 00:30 Ç¥½Ã ÅØ½ºÆ®
-    public TextMeshProUGUI scoreText;   // Score: 0 Ç¥½Ã ÅØ½ºÆ®
+    public TextMeshProUGUI timeText;    // 00:30 í‘œì‹œ í…ìŠ¤íŠ¸
+    public TextMeshProUGUI scoreText;   // Score: 0 í‘œì‹œ í…ìŠ¤íŠ¸
 
-    [Header("Á¡¼ö")]
+    [Header("ì ìˆ˜(ì˜µì…˜)")]
     public int score = 0;
 
-    [Header("Ã¼·Â(¿É¼Ç)")]
+    [Header("ì²´ë ¥(ì˜µì…˜)")]
     public int maxHealth = 100;
     public int currentHealth = 100;
+
+    [Header("Tier Popup UI (Dino03)")]
+    public Image tierPopupImage;        // Canvasì˜ UI Image
+    public Sprite highSprite;           // Dino03_01
+    public Sprite midSprite;            // Dino03_02
+    public Sprite lowSprite;            // Dino03_03
+    public Vector2 popupSize = new Vector2(900, 450);
+    public float popupSeconds = 1.2f;
+
+    [Header("Scene Flow (Optional)")]
+    public bool loadNextSceneAfterPopup = false;
+    public string nextSceneName = "Battle";
 
     float timeLeft;
     bool isGameOver = false;
@@ -53,10 +70,12 @@ public class LakeMiniGameManager : MonoBehaviour
         if (spawnInterval < warningTime + 0.05f)
             spawnInterval = warningTime + 0.05f;
 
-        // Å¸ÀÌ¸Ó ½ÃÀÛ
         timeLeft = gameDuration;
         UpdateTimeUI();
         UpdateHPOnScoreText();
+
+        if (tierPopupImage != null)
+            tierPopupImage.gameObject.SetActive(false);
 
         spawnRoutine = StartCoroutine(SpawnLoop());
     }
@@ -99,7 +118,6 @@ public class LakeMiniGameManager : MonoBehaviour
         leftMax = Mathf.Clamp(leftMax, minX, maxX);
         rightMin = Mathf.Clamp(rightMin, minX, maxX);
 
-        // Áß¾Ó ±İÁö ±¸°£ ÇÇÇØ¼­ ÁÂ/¿ì Áß ·£´ı
         float spawnX = (Random.value < 0.5f)
             ? Random.Range(minX, leftMax)
             : Random.Range(rightMin, maxX);
@@ -115,19 +133,13 @@ public class LakeMiniGameManager : MonoBehaviour
 
         if (warningPrefab != null)
         {
-            warn = Instantiate(
-                warningPrefab,
-                pos + Vector3.up * 0.10f,
-                Quaternion.identity
-            );
+            warn = Instantiate(warningPrefab, pos + Vector3.up * 0.10f, Quaternion.identity);
 
-            // Å©±â¸¸ Á¶Àı
             warn.transform.localScale = Vector3.one * 0.35f;
 
             var blink = warn.GetComponent<WarningBlink>();
             if (blink != null)
                 blink.SetBaseScale(warn.transform.localScale);
-
         }
 
         yield return new WaitForSeconds(warningTime);
@@ -138,8 +150,6 @@ public class LakeMiniGameManager : MonoBehaviour
         if (warn != null)
             Destroy(warn);
     }
-
-
 
     public void AddScore(int amount)
     {
@@ -153,7 +163,6 @@ public class LakeMiniGameManager : MonoBehaviour
     {
         currentHealth -= dmg;
         if (currentHealth < 0) currentHealth = 0;
-
         UpdateHPOnScoreText();
     }
 
@@ -163,12 +172,9 @@ public class LakeMiniGameManager : MonoBehaviour
         scoreText.text = $"Score: {currentHealth}";
     }
 
-
-
     void UpdateTimeUI()
     {
         if (timeText == null) return;
-
         int sec = Mathf.CeilToInt(timeLeft);
         timeText.text = $"00:{sec:00}";
     }
@@ -181,12 +187,47 @@ public class LakeMiniGameManager : MonoBehaviour
 
     void EndGame()
     {
+        if (isGameOver) return;
+
         isGameOver = true;
         StopSpawning();
         UpdateTimeUI();
 
-        Debug.Log("°ÔÀÓ Á¾·á!");
-        // ¿©±â¼­ ÃÖÁ¾ Á¡¼ö UI ÆĞ³Î ¶ç¿ì´Â °Íµµ ¿¬°á °¡´É
+        // Lake: ë‚¨ì€ ì²´ë ¥(0~100)ì„ ìµœì¢… ì ìˆ˜ë¡œ ì‚¬ìš©
+        int finalScore = MiniGameProgress.ClampScore100(currentHealth);
+        MiniGameProgress.SetLakeResult(finalScore);
+
+        StartCoroutine(EndFlow(finalScore));
+    }
+
+    IEnumerator EndFlow(int finalScore)
+    {
+        yield return ShowTierPopup(MiniGameProgress.ScoreToTier(finalScore));
+
+        if (loadNextSceneAfterPopup && !string.IsNullOrEmpty(nextSceneName))
+            SceneManager.LoadScene(nextSceneName);
+    }
+
+    IEnumerator ShowTierPopup(MiniGameProgress.Tier123 tier)
+    {
+        if (tierPopupImage == null) yield break;
+
+        tierPopupImage.gameObject.SetActive(true);
+        tierPopupImage.preserveAspect = true;
+
+        Sprite s = null;
+        if (tier == MiniGameProgress.Tier123.High_3) s = highSprite;
+        else if (tier == MiniGameProgress.Tier123.Mid_2) s = midSprite;
+        else s = lowSprite;
+
+        if (s != null) tierPopupImage.sprite = s;
+
+        // í¬ê²Œ ë³´ì´ê²Œ
+        tierPopupImage.rectTransform.anchoredPosition = Vector2.zero;
+        tierPopupImage.rectTransform.sizeDelta = popupSize;
+
+        yield return new WaitForSeconds(popupSeconds);
+        tierPopupImage.gameObject.SetActive(false);
     }
 
     public void StopSpawning()
