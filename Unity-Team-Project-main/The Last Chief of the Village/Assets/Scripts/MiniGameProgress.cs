@@ -1,129 +1,101 @@
 // MiniGameProgress.cs
-// 주석: 한글 / 게임에 표시되는 문자열: 영어
+// Field/Lake 미니게임 점수를 저장하고(0~100), 티어(1~3)로 변환해서 배틀에서 읽어오는 용도
 
 using UnityEngine;
 
 public static class MiniGameProgress
 {
-    // 1=Low, 2=Mid, 3=High
-    public enum Tier123 { Low_1 = 1, Mid_2 = 2, High_3 = 3 }
+    public enum Tier123
+    {
+        Low_1 = 1,
+        Mid_2 = 2,
+        High_3 = 3
+    }
 
-    // PlayerPrefs Key
-    private const string LAKE_SCORE_KEY  = "MINI_LAKE_SCORE";
-    private const string LAKE_TIER_KEY   = "MINI_LAKE_TIER";
-    private const string FIELD_SCORE_KEY = "MINI_FIELD_SCORE";
-    private const string FIELD_TIER_KEY  = "MINI_FIELD_TIER";
+    private const string KEY_FIELD_SCORE = "MINIGAME_FIELD_SCORE";
+    private const string KEY_FIELD_TIER  = "MINIGAME_FIELD_TIER";
+    private const string KEY_LAKE_SCORE  = "MINIGAME_LAKE_SCORE";
+    private const string KEY_LAKE_TIER   = "MINIGAME_LAKE_TIER";
 
-    private static bool _loaded = false;
+    // 배틀에서 디버그 로그용으로 바로 볼 수 있게 공개
+    public static int FieldScore { get; private set; } = -1;
+    public static int FieldTier  { get; private set; } = 2;
 
     public static int LakeScore  { get; private set; } = -1;
-    public static int FieldScore { get; private set; } = -1;
+    public static int LakeTier   { get; private set; } = 2;
 
-    public static int LakeTier   { get; private set; } = (int)Tier123.Mid_2;
-    public static int FieldTier  { get; private set; } = (int)Tier123.Mid_2;
+    // ===== 공통 유틸 =====
+    public static int ClampScore100(int score) => Mathf.Clamp(score, 0, 100);
 
-    public static void Load()
+    public static Tier123 ScoreToTier(int score01_100)
     {
-        LakeScore  = PlayerPrefs.GetInt(LAKE_SCORE_KEY, -1);
-        FieldScore = PlayerPrefs.GetInt(FIELD_SCORE_KEY, -1);
-
-        LakeTier   = PlayerPrefs.GetInt(LAKE_TIER_KEY, (int)Tier123.Mid_2);
-        FieldTier  = PlayerPrefs.GetInt(FIELD_TIER_KEY, (int)Tier123.Mid_2);
-
-        LakeTier  = Mathf.Clamp(LakeTier, 1, 3);
-        FieldTier = Mathf.Clamp(FieldTier, 1, 3);
-
-        if (LakeScore >= 0)  LakeScore  = ClampScore100(LakeScore);
-        if (FieldScore >= 0) FieldScore = ClampScore100(FieldScore);
-
-        _loaded = true;
-    }
-
-    private static void EnsureLoaded()
-    {
-        if (!_loaded) Load();
-    }
-
-    public static int ClampScore100(int s) => Mathf.Clamp(s, 0, 100);
-
-    // 점수 -> 티어 enum (Field/Lake 팝업에서 주로 사용)
-    public static Tier123 ScoreToTier(int rawScore)
-    {
-        int s = ClampScore100(rawScore);
+        int s = ClampScore100(score01_100);
         if (s <= 30) return Tier123.Low_1;
         if (s <= 65) return Tier123.Mid_2;
         return Tier123.High_3;
     }
 
-    // 점수 -> 티어 int (GameManager에서 캐스팅할 때 사용)
-    public static int TierFromScore(int rawScore) => (int)ScoreToTier(rawScore);
-
-    // 저장 API
-    public static void SetLakeResult(int rawScore)  => SaveLakeScore(rawScore);
-    public static void SetFieldResult(int rawScore) => SaveFieldScore(rawScore);
-
-    public static void SaveLakeScore(int rawScore)
+    // ===== 저장/로드 =====
+    public static void SetFieldResult(int score01_100)
     {
-        EnsureLoaded();
-
-        int s = ClampScore100(rawScore);
-        int t = TierFromScore(s);
-
-        LakeScore = s;
-        LakeTier  = t;
-
-        PlayerPrefs.SetInt(LAKE_SCORE_KEY, LakeScore);
-        PlayerPrefs.SetInt(LAKE_TIER_KEY, LakeTier);
-        PlayerPrefs.Save();
-    }
-
-    public static void SaveFieldScore(int rawScore)
-    {
-        EnsureLoaded();
-
-        int s = ClampScore100(rawScore);
-        int t = TierFromScore(s);
+        int s = ClampScore100(score01_100);
+        Tier123 t = ScoreToTier(s);
 
         FieldScore = s;
-        FieldTier  = t;
+        FieldTier  = (int)t;
 
-        PlayerPrefs.SetInt(FIELD_SCORE_KEY, FieldScore);
-        PlayerPrefs.SetInt(FIELD_TIER_KEY, FieldTier);
+        PlayerPrefs.SetInt(KEY_FIELD_SCORE, FieldScore);
+        PlayerPrefs.SetInt(KEY_FIELD_TIER,  FieldTier);
         PlayerPrefs.Save();
     }
 
-    // 호환용(이전 코드에서 쓰던 이름이 남아도 컴파일되게)
-    public static int ComputeTier(int score) => TierFromScore(score);
-    public static void SaveScore(int score) => SaveLakeScore(score);
-
-    // 배틀에서 안전하게 읽기
-    public static bool TryGetLakeTier(out int tier)
+    public static void SetLakeResult(int score01_100)
     {
-        EnsureLoaded();
-        if (LakeScore < 0) { tier = (int)Tier123.Mid_2; return false; }
-        tier = LakeTier;
-        return true;
-    }
+        int s = ClampScore100(score01_100);
+        Tier123 t = ScoreToTier(s);
 
-    public static bool TryGetFieldTier(out int tier)
-    {
-        EnsureLoaded();
-        if (FieldScore < 0) { tier = (int)Tier123.Mid_2; return false; }
-        tier = FieldTier;
-        return true;
-    }
+        LakeScore = s;
+        LakeTier  = (int)t;
 
-    public static void ClearAll()
-    {
-        PlayerPrefs.DeleteKey(LAKE_SCORE_KEY);
-        PlayerPrefs.DeleteKey(LAKE_TIER_KEY);
-        PlayerPrefs.DeleteKey(FIELD_SCORE_KEY);
-        PlayerPrefs.DeleteKey(FIELD_TIER_KEY);
+        PlayerPrefs.SetInt(KEY_LAKE_SCORE, LakeScore);
+        PlayerPrefs.SetInt(KEY_LAKE_TIER,  LakeTier);
         PlayerPrefs.Save();
+    }
 
-        _loaded = false;
+    public static void Load()
+    {
+        if (PlayerPrefs.HasKey(KEY_FIELD_SCORE)) FieldScore = PlayerPrefs.GetInt(KEY_FIELD_SCORE);
+        if (PlayerPrefs.HasKey(KEY_FIELD_TIER))  FieldTier  = PlayerPrefs.GetInt(KEY_FIELD_TIER);
 
-        LakeScore = FieldScore = -1;
-        LakeTier = FieldTier = (int)Tier123.Mid_2;
+        if (PlayerPrefs.HasKey(KEY_LAKE_SCORE))  LakeScore = PlayerPrefs.GetInt(KEY_LAKE_SCORE);
+        if (PlayerPrefs.HasKey(KEY_LAKE_TIER))   LakeTier  = PlayerPrefs.GetInt(KEY_LAKE_TIER);
+
+        // 티어 범위 보정
+        FieldTier = Mathf.Clamp(FieldTier, 1, 3);
+        LakeTier  = Mathf.Clamp(LakeTier,  1, 3);
+    }
+
+    public static bool TryGetFieldTier(out int tier123)
+    {
+        if (PlayerPrefs.HasKey(KEY_FIELD_TIER))
+        {
+            tier123 = Mathf.Clamp(PlayerPrefs.GetInt(KEY_FIELD_TIER), 1, 3);
+            return true;
+        }
+
+        tier123 = 2; // 기본 Mid
+        return false;
+    }
+
+    public static bool TryGetLakeTier(out int tier123)
+    {
+        if (PlayerPrefs.HasKey(KEY_LAKE_TIER))
+        {
+            tier123 = Mathf.Clamp(PlayerPrefs.GetInt(KEY_LAKE_TIER), 1, 3);
+            return true;
+        }
+
+        tier123 = 2; // 기본 Mid
+        return false;
     }
 }

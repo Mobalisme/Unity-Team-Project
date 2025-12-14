@@ -1,9 +1,6 @@
-// FieldMiniGame.cs
-// 주석: 한글 / 게임에 표시되는 문자열: 영어
-
-using UnityEngine;
-using TMPro;
 using System.Collections;
+using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -19,6 +16,8 @@ public class FieldMiniGame : MonoBehaviour
     [Header("스폰 위치")]
     public Transform spawnLeftTop;
     public Transform spawnRightTop;
+
+    [Header("스폰 주기")]
     public float spawnInterval = 0.7f;
 
     [Header("스폰 가중치")]
@@ -28,8 +27,6 @@ public class FieldMiniGame : MonoBehaviour
 
     [Header("게임 시간")]
     public float gameDuration = 30f;
-
-    Color timeNormalColor = Color.white;
 
     [Header("UI")]
     public TextMeshProUGUI scoreText;
@@ -45,26 +42,27 @@ public class FieldMiniGame : MonoBehaviour
     public Vector2 camMaxBounds;
 
     [Header("Tier Popup UI (Dino02)")]
-    public Image tierPopupImage;    // Canvas의 UI Image
-    public Sprite highSprite;       // Dino02_01
-    public Sprite midSprite;        // Dino02_02
-    public Sprite lowSprite;        // Dino02_03
+    public Image tierPopupImage;
+    public Sprite highSprite; // Dino02_01
+    public Sprite midSprite;  // Dino02_02
+    public Sprite lowSprite;  // Dino02_03
     public Vector2 popupSize = new Vector2(900, 450);
     public float popupSeconds = 1.2f;
 
-    [Header("Scene Flow (Optional)")]
-    public bool loadNextSceneAfterPopup = false;
-    public string nextSceneName = "Battle";
+    [Header("Scene Transition")]
+    public bool loadNextSceneAfterPopup = true;
 
-    float gameTimer;
-    float spawnTimer;
-    bool isPlaying;
-    bool ended = false;
-
-    Coroutine shakeCo;
+    [SceneName]
+    public string nextSceneName;
 
     [Header("점수")]
     public int score = 0;
+
+    private float gameTimer;
+    private float spawnTimer;
+    private bool isPlaying;
+    private bool ended = false;
+    private Coroutine shakeCo;
 
     private void Awake()
     {
@@ -74,7 +72,6 @@ public class FieldMiniGame : MonoBehaviour
     private void Start()
     {
         StartGame();
-
         if (tierPopupImage != null)
             tierPopupImage.gameObject.SetActive(false);
     }
@@ -89,9 +86,6 @@ public class FieldMiniGame : MonoBehaviour
         score = 0;
         RefreshScoreUI();
         RefreshTimeUI();
-
-        if (timeText != null)
-            timeNormalColor = timeText.color;
     }
 
     private void Update()
@@ -118,47 +112,45 @@ public class FieldMiniGame : MonoBehaviour
         RefreshTimeUI();
     }
 
-    void SpawnItem()
+    private void SpawnItem()
     {
         if (spawnLeftTop == null || spawnRightTop == null) return;
 
         GameObject prefab = PickByWeight();
         if (prefab == null) return;
 
-        float randomX = Random.Range(spawnLeftTop.position.x, spawnRightTop.position.x);
+        float x = Random.Range(spawnLeftTop.position.x, spawnRightTop.position.x);
         float y = spawnLeftTop.position.y;
 
-        Vector3 spawnPos = new Vector3(randomX, y, 0f);
-        Instantiate(prefab, spawnPos, Quaternion.identity);
+        Instantiate(prefab, new Vector3(x, y, 0f), Quaternion.identity);
     }
 
-    GameObject PickByWeight()
+    private GameObject PickByWeight()
     {
         int total = appleWeight + grapeWeight + bombWeight;
         if (total <= 0) return applePrefab;
 
         int r = Random.Range(0, total);
-
         if (r < appleWeight) return applePrefab;
         r -= appleWeight;
-
         if (r < grapeWeight) return grapePrefab;
         return bombPrefab;
     }
 
     public void AddScore(int amount)
     {
+        if (ended) return;
         score += amount;
         RefreshScoreUI();
     }
 
-    void RefreshScoreUI()
+    private void RefreshScoreUI()
     {
         if (scoreText != null)
             scoreText.text = $"Score: {score}";
     }
 
-    void RefreshTimeUI()
+    private void RefreshTimeUI()
     {
         if (timeText == null) return;
 
@@ -168,22 +160,22 @@ public class FieldMiniGame : MonoBehaviour
         timeText.text = $"{minutes:00}:{seconds:00}";
     }
 
-    void EndGame()
+    private void EndGame()
     {
         if (ended) return;
         ended = true;
 
-        // 화면 아이템 삭제
         ClearAllItems();
 
-        // Field: 점수(0~100 clamp)로 티어 판정
         int finalScore = MiniGameProgress.ClampScore100(score);
         MiniGameProgress.SetFieldResult(finalScore);
+
+        Debug.Log($"[FIELD] End. Score={finalScore}, Tier={MiniGameProgress.ScoreToTier(finalScore)}");
 
         StartCoroutine(EndFlow(finalScore));
     }
 
-    IEnumerator EndFlow(int finalScore)
+    private IEnumerator EndFlow(int finalScore)
     {
         yield return ShowTierPopup(MiniGameProgress.ScoreToTier(finalScore));
 
@@ -191,7 +183,7 @@ public class FieldMiniGame : MonoBehaviour
             SceneManager.LoadScene(nextSceneName);
     }
 
-    IEnumerator ShowTierPopup(MiniGameProgress.Tier123 tier)
+    private IEnumerator ShowTierPopup(MiniGameProgress.Tier123 tier)
     {
         if (tierPopupImage == null) yield break;
 
@@ -209,17 +201,18 @@ public class FieldMiniGame : MonoBehaviour
         tierPopupImage.rectTransform.sizeDelta = popupSize;
 
         yield return new WaitForSeconds(popupSeconds);
+
         tierPopupImage.gameObject.SetActive(false);
     }
 
-    void ClearAllItems()
+    private void ClearAllItems()
     {
+        // 경고 제거: FindObjectsOfType 대신 FindObjectsByType 사용
         var items = Object.FindObjectsByType<FallingItem>(FindObjectsSortMode.None);
         foreach (var it in items)
             Destroy(it.gameObject);
     }
 
-    // 폭탄 효과: 카메라 흔들기
     public void ShakeCamera()
     {
         Camera cam = targetCamera != null ? targetCamera : Camera.main;
@@ -229,7 +222,7 @@ public class FieldMiniGame : MonoBehaviour
         shakeCo = StartCoroutine(ShakeRoutine(cam));
     }
 
-    IEnumerator ShakeRoutine(Camera cam)
+    private IEnumerator ShakeRoutine(Camera cam)
     {
         Vector3 origin = cam.transform.position;
         float t = 0f;

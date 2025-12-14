@@ -1144,18 +1144,16 @@ MonoBehaviour:
   gameDuration: 30
   timeText: {fileID: 153426385}
   scoreText: {fileID: 767140096}
-  useHealthAsScore: 1
-  score: 0
   maxHealth: 100
   currentHealth: 100
   tierPopupImage: {fileID: 1308135698}
   highSprite: {fileID: 2039437368, guid: 05e4947a69d3f864ab73916dcb63b7fe, type: 3}
   midSprite: {fileID: -913830290, guid: fe5f5f450e10e7b4f8036435f3176193, type: 3}
   lowSprite: {fileID: -1297629810, guid: 48894a72df092c34f9166c4152c073a6, type: 3}
+  popupSize: {x: 900, y: 450}
   popupSeconds: 1.5
-  autoLoadNextScene: 0
-  nextSceneName: Lake
-  nextSceneDelay: 2
+  loadNextSceneAfterPopup: 1
+  nextSceneName: Battle
 --- !u!4 &934713784
 Transform:
   m_ObjectHideFlags: 0
@@ -1680,7 +1678,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1308135697
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1698,7 +1696,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 520, y: 520}
+  m_SizeDelta: {x: 900, y: 900}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1308135698
 MonoBehaviour:

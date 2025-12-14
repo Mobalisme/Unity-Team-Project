@@ -2237,7 +2237,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &983995542
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2255,7 +2255,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 900, y: 900}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &983995543
 MonoBehaviour:
@@ -3890,14 +3890,14 @@ MonoBehaviour:
   shakeStrength: 0.18
   camMinBounds: {x: 0, y: 0}
   camMaxBounds: {x: 0, y: 0}
-  tierPopupImage: {fileID: 0}
+  tierPopupImage: {fileID: 983995543}
   highSprite: {fileID: 1098156940, guid: 9953938cf8f798344b482850ef92c672, type: 3}
   midSprite: {fileID: 2057163, guid: 094108503c04a70499900d319b7b0db1, type: 3}
   lowSprite: {fileID: 1439045682, guid: 29ef205dd380ad141813226aab8b21ee, type: 3}
   popupSize: {x: 900, y: 450}
   popupSeconds: 1.2
-  loadNextSceneAfterPopup: 0
-  nextSceneName: Battle
+  loadNextSceneAfterPopup: 1
+  nextSceneName: Lake Mini Game
   score: 0
 --- !u!4 &1342111665
 Transform:

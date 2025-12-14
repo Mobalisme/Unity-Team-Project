@@ -66,15 +66,7 @@ public class BattleUI : MonoBehaviour
         if (defendButton != null) defendButton.interactable = value;
     }
 
-    // ===== (추가) 구버전 GameManager 호환용 =====
-    public void RefreshAll()
-    {
-        // 구버전 코드가 호출해도 에러 안 나게만 처리
-        // 실제 UI 갱신은 GameManager가 HUD 텍스트를 갱신하는 구조로 이미 되어있음
-    }
-
-    public void SetBossPhase(int phase)
-    {
-        // 구버전 코드가 호출해도 에러 안 나게만 처리
-    }
+    // (호환용) 예전 GameManager가 호출해도 에러 안 나게
+    public void RefreshAll() { }
+    public void SetBossPhase(int phase) { }
 }

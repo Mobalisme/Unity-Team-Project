@@ -1,6 +1,3 @@
-// LakeMiniGameManager.cs
-// 주석: 한글 / 게임에 표시되는 문자열: 영어
-
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -12,58 +9,56 @@ public class LakeMiniGameManager : MonoBehaviour
     public static LakeMiniGameManager Instance;
 
     [Header("프리팹 설정")]
-    public GameObject obstaclePrefab;   // 물줄기 프리팹
-    public GameObject warningPrefab;    // 경고(느낌표) 프리팹
+    public GameObject obstaclePrefab;
+    public GameObject warningPrefab;
 
-    [Header("스폰 범위 기준 Transform")]
-    public Transform spawnLeftBottom;   // 왼쪽 기준점
-    public Transform spawnRightBottom;  // 오른쪽 기준점
+    [Header("스폰 범위 기준 Transform(좌하단, 우하단)")]
+    public Transform spawnLeftBottom;
+    public Transform spawnRightBottom;
 
     [Header("스폰 타이밍")]
-    public float spawnInterval = 1.2f;  // 물줄기 생성 간격
-    public float warningTime = 0.6f;    // 몇 초 전에 예고할지
+    public float spawnInterval = 1.2f;
+    public float warningTime = 0.6f;
 
     [Header("중앙 금지 구간(가운데 안 나오게)")]
-    public float centerX = 0f;          // 가운데 X (필요시 조정)
-    public float centerBlockWidth = 2f; // 중앙 금지 폭
+    public float centerX = 0f;
+    public float centerBlockWidth = 2f;
 
     [Header("게임 시간")]
     public float gameDuration = 30f;
 
     [Header("UI")]
-    public TextMeshProUGUI timeText;    // 00:30 표시 텍스트
-    public TextMeshProUGUI scoreText;   // Score: 0 표시 텍스트
+    public TextMeshProUGUI timeText;
+    public TextMeshProUGUI scoreText;
 
-    [Header("점수(옵션)")]
-    public int score = 0;
-
-    [Header("체력(옵션)")]
+    [Header("체력(0~100)")]
     public int maxHealth = 100;
     public int currentHealth = 100;
 
     [Header("Tier Popup UI (Dino03)")]
-    public Image tierPopupImage;        // Canvas의 UI Image
-    public Sprite highSprite;           // Dino03_01
-    public Sprite midSprite;            // Dino03_02
-    public Sprite lowSprite;            // Dino03_03
+    public Image tierPopupImage;
+    public Sprite highSprite; // Dino03_01
+    public Sprite midSprite;  // Dino03_02
+    public Sprite lowSprite;  // Dino03_03
     public Vector2 popupSize = new Vector2(900, 450);
     public float popupSeconds = 1.2f;
 
-    [Header("Scene Flow (Optional)")]
-    public bool loadNextSceneAfterPopup = false;
-    public string nextSceneName = "Battle";
+    [Header("Scene Transition")]
+    public bool loadNextSceneAfterPopup = true;
 
-    float timeLeft;
-    bool isGameOver = false;
+    [SceneName]
+    public string nextSceneName; // Build Settings에 있는 씬 이름 드롭다운
 
-    Coroutine spawnRoutine;
+    private float timeLeft;
+    private bool isGameOver = false;
+    private Coroutine spawnRoutine;
 
-    void Awake()
+    private void Awake()
     {
         Instance = this;
     }
 
-    void Start()
+    private void Start()
     {
         if (currentHealth <= 0) currentHealth = maxHealth;
 
@@ -72,7 +67,7 @@ public class LakeMiniGameManager : MonoBehaviour
 
         timeLeft = gameDuration;
         UpdateTimeUI();
-        UpdateHPOnScoreText();
+        UpdateHPAsScoreText();
 
         if (tierPopupImage != null)
             tierPopupImage.gameObject.SetActive(false);
@@ -80,7 +75,7 @@ public class LakeMiniGameManager : MonoBehaviour
         spawnRoutine = StartCoroutine(SpawnLoop());
     }
 
-    void Update()
+    private void Update()
     {
         if (isGameOver) return;
 
@@ -90,12 +85,10 @@ public class LakeMiniGameManager : MonoBehaviour
         UpdateTimeUI();
 
         if (timeLeft <= 0f)
-        {
             EndGame();
-        }
     }
 
-    IEnumerator SpawnLoop()
+    private IEnumerator SpawnLoop()
     {
         while (!isGameOver)
         {
@@ -104,7 +97,7 @@ public class LakeMiniGameManager : MonoBehaviour
         }
     }
 
-    void SpawnObstacle()
+    private void SpawnObstacle()
     {
         if (obstaclePrefab == null || spawnLeftBottom == null || spawnRightBottom == null)
             return;
@@ -127,14 +120,13 @@ public class LakeMiniGameManager : MonoBehaviour
         StartCoroutine(SpawnWithWarning(new Vector3(spawnX, spawnY, 0f)));
     }
 
-    IEnumerator SpawnWithWarning(Vector3 pos)
+    private IEnumerator SpawnWithWarning(Vector3 pos)
     {
         GameObject warn = null;
 
         if (warningPrefab != null)
         {
             warn = Instantiate(warningPrefab, pos + Vector3.up * 0.10f, Quaternion.identity);
-
             warn.transform.localScale = Vector3.one * 0.35f;
 
             var blink = warn.GetComponent<WarningBlink>();
@@ -151,41 +143,33 @@ public class LakeMiniGameManager : MonoBehaviour
             Destroy(warn);
     }
 
-    public void AddScore(int amount)
-    {
-        if (isGameOver) return;
-        score += amount;
-        if (score < 0) score = 0;
-        UpdateScoreUI();
-    }
-
     public void TakeDamage(int dmg)
     {
+        if (isGameOver) return;
+
         currentHealth -= dmg;
         if (currentHealth < 0) currentHealth = 0;
-        UpdateHPOnScoreText();
+
+        UpdateHPAsScoreText();
+
+        if (currentHealth <= 0)
+            EndGame();
     }
 
-    void UpdateHPOnScoreText()
+    private void UpdateHPAsScoreText()
     {
         if (scoreText == null) return;
         scoreText.text = $"Score: {currentHealth}";
     }
 
-    void UpdateTimeUI()
+    private void UpdateTimeUI()
     {
         if (timeText == null) return;
         int sec = Mathf.CeilToInt(timeLeft);
         timeText.text = $"00:{sec:00}";
     }
 
-    void UpdateScoreUI()
-    {
-        if (scoreText == null) return;
-        scoreText.text = $"Score: {score}";
-    }
-
-    void EndGame()
+    private void EndGame()
     {
         if (isGameOver) return;
 
@@ -193,14 +177,15 @@ public class LakeMiniGameManager : MonoBehaviour
         StopSpawning();
         UpdateTimeUI();
 
-        // Lake: 남은 체력(0~100)을 최종 점수로 사용
         int finalScore = MiniGameProgress.ClampScore100(currentHealth);
         MiniGameProgress.SetLakeResult(finalScore);
+
+        Debug.Log($"[LAKE] End. Score={finalScore}, Tier={MiniGameProgress.ScoreToTier(finalScore)}");
 
         StartCoroutine(EndFlow(finalScore));
     }
 
-    IEnumerator EndFlow(int finalScore)
+    private IEnumerator EndFlow(int finalScore)
     {
         yield return ShowTierPopup(MiniGameProgress.ScoreToTier(finalScore));
 
@@ -208,7 +193,7 @@ public class LakeMiniGameManager : MonoBehaviour
             SceneManager.LoadScene(nextSceneName);
     }
 
-    IEnumerator ShowTierPopup(MiniGameProgress.Tier123 tier)
+    private IEnumerator ShowTierPopup(MiniGameProgress.Tier123 tier)
     {
         if (tierPopupImage == null) yield break;
 
@@ -222,11 +207,11 @@ public class LakeMiniGameManager : MonoBehaviour
 
         if (s != null) tierPopupImage.sprite = s;
 
-        // 크게 보이게
         tierPopupImage.rectTransform.anchoredPosition = Vector2.zero;
         tierPopupImage.rectTransform.sizeDelta = popupSize;
 
         yield return new WaitForSeconds(popupSeconds);
+
         tierPopupImage.gameObject.SetActive(false);
     }
 
