@@ -22,6 +22,31 @@ public class GameManager : MonoBehaviour
     public Image playerDinoIcon2;   // PlayerDino2
     public Image playerDinoIcon3;   // PlayerDino3
 
+    [Header("Battle Visuals (Canvas)")]
+    [Tooltip("Canvas > Background(Image)")]
+    public Image backgroundImage;
+
+    [Tooltip("Phase 1 background (Battlebackground01)")]
+    public Sprite battleBackground01;
+
+    [Tooltip("Phase 2 background (Battlebackground02)")]
+    public Sprite battleBackground02;
+
+    [Tooltip("Phase 3 background (Battlebackground03)")]
+    public Sprite battleBackground03;
+
+    [Tooltip("Canvas > EnemyDino(Image)")]
+    public Image enemyDinoImage;
+
+    [Tooltip("Phase 1 boss sprite (EnemyDino)")]
+    public Sprite enemyDinoPhase1;
+
+    [Tooltip("Phase 2 boss sprite (EnemyDino2)")]
+    public Sprite enemyDinoPhase2;
+
+    [Tooltip("Phase 3 boss sprite (EnemyDino3)")]
+    public Sprite enemyDinoPhase3;
+
     [Header("Hit Shake (Optional)")]
     public BattleShaker playerShaker;
     public BattleShaker enemyShaker;
@@ -76,6 +101,19 @@ public class GameManager : MonoBehaviour
 
     public int aoeMinDamage = 1;
 
+    [Header("Boss Recover (Phase2+)")]
+    [Tooltip("Recover chance in Phase 2")]
+    [Range(0f, 1f)] public float bossRecoverChancePhase2 = 0.18f;
+
+    [Tooltip("Recover chance in Phase 3")]
+    [Range(0f, 1f)] public float bossRecoverChancePhase3 = 0.28f;
+
+    [Tooltip("Boss heal = maxHP * ratio (before cap)")]
+    [Range(0.03f, 0.20f)] public float bossRecoverRatio = 0.08f;
+
+    [Tooltip("Boss heal cap = missingHP * capRatio")]
+    [Range(0.2f, 1.0f)] public float bossRecoverCapMissingRatio = 0.45f;
+
     // ===================== 런타임 데이터 =====================
     private class Dino
     {
@@ -120,23 +158,23 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start()
-{
-    // 미니게임(Field/Lake) 결과를 불러와서 배틀 파티 티어에 반영
-    MiniGameProgress.Load();
+    {
+        // 미니게임(Field/Lake) 결과를 불러와서 배틀 파티 티어에 반영
+        MiniGameProgress.Load();
 
-    bool hasField = MiniGameProgress.TryGetFieldTier(out int fieldTier);
-    bool hasLake  = MiniGameProgress.TryGetLakeTier(out int lakeTier);
+        bool hasField = MiniGameProgress.TryGetFieldTier(out int fieldTier);
+        bool hasLake = MiniGameProgress.TryGetLakeTier(out int lakeTier);
 
-    if (hasField) playerDino2Tier = (Tier123)fieldTier; // Field -> Dino2(Attacker)
-    if (hasLake)  playerDino3Tier = (Tier123)lakeTier;  // Lake  -> Dino3(Tank)
+        if (hasField) playerDino2Tier = (Tier123)fieldTier; // Field -> Dino2(Attacker)
+        if (hasLake) playerDino3Tier = (Tier123)lakeTier;   // Lake  -> Dino3(Tank)
 
-    BuildParty();
+        BuildParty();
 
-    if (debugLogMiniGameStats)
-        LogMiniGameAndAppliedStats(hasField, fieldTier, hasLake, lakeTier);
+        if (debugLogMiniGameStats)
+            LogMiniGameAndAppliedStats(hasField, fieldTier, hasLake, lakeTier);
 
-    StartPlayerPlanning();
-}
+        StartPlayerPlanning();
+    }
 
     // ===================== 파티 구성(요구 스탯 그대로) =====================
     private void BuildParty()
@@ -156,7 +194,8 @@ public class GameManager : MonoBehaviour
         boss = new Dino("Boss", bossMaxHP, 0, 0);
 
         bossPhase = 1;
-        RefreshBossPhaseUpOnly();
+        RefreshBossPhaseUpOnly(); // 초기(대부분 1페)
+        ApplyBossPhaseVisuals();  // 페이즈별 배경/스프라이트 적용
 
         // 아이콘 배열
         partyIcons = new Image[3] { playerDinoIcon1, playerDinoIcon2, playerDinoIcon3 };
@@ -264,6 +303,8 @@ public class GameManager : MonoBehaviour
     }
 
     // ===================== 플레이어 턴 실행(선택 후 일괄 실행) =====================
+    // 중요: “Recover→Attack”처럼 묶어서 처리하지 않고,
+    //       1→2→3 순서대로 각자가 선택한 행동(Attack/Recover)을 그대로 실행한다.
     private IEnumerator ResolvePlayerTurnFlow()
     {
         state = TurnState.Resolving;
@@ -276,46 +317,36 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.25f);
 
-        // 1) Recover 먼저 처리(회복 선택한 공룡만)
         for (int i = 0; i < 3; i++)
         {
             if (party[i].Dead) continue;
-            if (plannedActions[i] != ActionType.Recover) continue;
 
             focusIndex = i;
             UpdatePartyIcons();
 
-            int heal = ComputePlayerHeal(party[i]);
-            int before = party[i].hp;
-            party[i].hp = Mathf.Min(party[i].maxHP, party[i].hp + heal);
-            int realHeal = party[i].hp - before;
+            if (plannedActions[i] == ActionType.Attack)
+            {
+                int dmg = ComputeDamage(party[i].atk, GetBossDefense(), minDamage);
+                ApplyDamage(boss, dmg);
 
-            if (battleUI != null)
-                battleUI.SetMessage($"{party[i].name} Recover (+{realHeal})");
+                if (enemyShaker != null) enemyShaker.Shake();
 
-            UpdateHUD();
-            yield return new WaitForSeconds(0.45f);
-        }
+                // HP가 내려가면 페이즈가 올라갈 수 있음(올라가면 즉시 배경/보스 스프라이트 변경)
+                RefreshBossPhaseUpOnly();
 
-        // 2) Attack 처리(공격 선택한 공룡만)
-        for (int i = 0; i < 3; i++)
-        {
-            if (party[i].Dead) continue;
-            if (plannedActions[i] != ActionType.Attack) continue;
+                if (battleUI != null)
+                    battleUI.SetMessage($"{party[i].name} attacks (-{dmg})");
+            }
+            else // Recover
+            {
+                int heal = ComputePlayerHeal(party[i]);
+                int before = party[i].hp;
+                party[i].hp = Mathf.Min(party[i].maxHP, party[i].hp + heal);
+                int realHeal = party[i].hp - before;
 
-            focusIndex = i;
-            UpdatePartyIcons();
-
-            int dmg = ComputeDamage(party[i].atk, GetBossDefense(), minDamage);
-            ApplyDamage(boss, dmg);
-
-            if (enemyShaker != null) enemyShaker.Shake();
-
-            // HP가 내려가면 페이즈가 올라갈 수 있음
-            RefreshBossPhaseUpOnly();
-
-            if (battleUI != null)
-                battleUI.SetMessage($"{party[i].name} attacks (-{dmg})");
+                if (battleUI != null)
+                    battleUI.SetMessage($"{party[i].name} Recover (+{realHeal})");
+            }
 
             UpdateHUD();
             yield return new WaitForSeconds(0.45f);
@@ -334,7 +365,7 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        // 3) 보스 행동
+        // 보스 행동
         StartCoroutine(BossTurnFlow());
     }
 
@@ -352,7 +383,7 @@ public class GameManager : MonoBehaviour
         return Mathf.Max(1, heal);
     }
 
-    // ===================== 보스 턴(2페부터 확률적으로 단체공격) =====================
+    // ===================== 보스 턴(2페부터 확률적으로 단체공격 + 확률 Recover) =====================
     private IEnumerator BossTurnFlow()
     {
         state = TurnState.BossActing;
@@ -365,67 +396,88 @@ public class GameManager : MonoBehaviour
         if (boss.Dead) { EndBattle(true); yield break; }
         if (AllPartyDead()) { EndBattle(false); yield break; }
 
-        bool doAoe = ShouldBossUseAoe();
-
-        if (doAoe)
+        // 1) (Phase2+) Recover 확률 체크
+        if (ShouldBossRecover())
         {
+            int before = boss.hp;
+            int heal = ComputeBossHeal();
+            boss.hp = Mathf.Min(boss.maxHP, boss.hp + heal);
+            int realHeal = boss.hp - before;
+
             if (battleUI != null)
-                battleUI.SetMessage("Boss uses AoE!");
+                battleUI.SetMessage($"Boss Recover (+{realHeal})");
 
-            yield return new WaitForSeconds(0.2f);
+            UpdateHUD();
+            yield return new WaitForSeconds(0.85f);
 
-            int bossAtk = GetBossAttack();
-
-            // 단체 공격: 살아있는 3마리 모두에게 감소된 데미지
-            for (int i = 0; i < 3; i++)
-            {
-                if (party[i].Dead) continue;
-
-                focusIndex = i;
-                UpdatePartyIcons();
-
-                int baseDmg = ComputeDamage(bossAtk, party[i].def, aoeMinDamage);
-                int dmg = Mathf.Max(aoeMinDamage, Mathf.RoundToInt(baseDmg * aoeMultiplier));
-
-                ApplyDamage(party[i], dmg);
-
-                if (playerShaker != null) playerShaker.Shake();
-
-                UpdateHUD();
-                yield return new WaitForSeconds(0.25f);
-            }
-
-            focusIndex = -1;
-            UpdatePartyIcons();
-
-            yield return new WaitForSeconds(0.4f);
-
-            if (AllPartyDead()) { EndBattle(false); yield break; }
+            // Recover로 HP가 올라가도 페이즈는 내려가지 않음(Up-only)
+            // (여기서는 따로 RefreshBossPhaseUpOnly() 호출해도 의미 없음)
         }
         else
         {
-            // 단일 공격: 랜덤 생존 대상 1명
-            int target = FindRandomAliveIndex();
-            if (target == -1) { EndBattle(false); yield break; }
+            // 2) (Phase2+) AoE 확률 체크, 아니면 단일 공격
+            bool doAoe = ShouldBossUseAoe();
 
-            focusIndex = target;
-            UpdatePartyIcons();
+            if (doAoe)
+            {
+                if (battleUI != null)
+                    battleUI.SetMessage("Boss uses AoE!");
 
-            int dmg = ComputeDamage(GetBossAttack(), party[target].def, minDamage);
-            ApplyDamage(party[target], dmg);
+                yield return new WaitForSeconds(0.2f);
 
-            if (playerShaker != null) playerShaker.Shake();
+                int bossAtk = GetBossAttack();
 
-            if (battleUI != null)
-                battleUI.SetMessage($"Boss attacks {party[target].name} (-{dmg})");
+                // 단체 공격: 살아있는 3마리 모두에게 감소된 데미지
+                for (int i = 0; i < 3; i++)
+                {
+                    if (party[i].Dead) continue;
 
-            UpdateHUD();
-            yield return new WaitForSeconds(0.9f);
+                    focusIndex = i;
+                    UpdatePartyIcons();
 
-            focusIndex = -1;
-            UpdatePartyIcons();
+                    int baseDmg = ComputeDamage(bossAtk, party[i].def, aoeMinDamage);
+                    int dmg = Mathf.Max(aoeMinDamage, Mathf.RoundToInt(baseDmg * aoeMultiplier));
 
-            if (AllPartyDead()) { EndBattle(false); yield break; }
+                    ApplyDamage(party[i], dmg);
+
+                    if (playerShaker != null) playerShaker.Shake();
+
+                    UpdateHUD();
+                    yield return new WaitForSeconds(0.25f);
+                }
+
+                focusIndex = -1;
+                UpdatePartyIcons();
+
+                yield return new WaitForSeconds(0.4f);
+
+                if (AllPartyDead()) { EndBattle(false); yield break; }
+            }
+            else
+            {
+                // 단일 공격: 랜덤 생존 대상 1명
+                int target = FindRandomAliveIndex();
+                if (target == -1) { EndBattle(false); yield break; }
+
+                focusIndex = target;
+                UpdatePartyIcons();
+
+                int dmg = ComputeDamage(GetBossAttack(), party[target].def, minDamage);
+                ApplyDamage(party[target], dmg);
+
+                if (playerShaker != null) playerShaker.Shake();
+
+                if (battleUI != null)
+                    battleUI.SetMessage($"Boss attacks {party[target].name} (-{dmg})");
+
+                UpdateHUD();
+                yield return new WaitForSeconds(0.9f);
+
+                focusIndex = -1;
+                UpdatePartyIcons();
+
+                if (AllPartyDead()) { EndBattle(false); yield break; }
+            }
         }
 
         // 다음 턴: 다시 1→2→3 행동 선택
@@ -436,6 +488,38 @@ public class GameManager : MonoBehaviour
         }
 
         StartPlayerPlanning();
+    }
+
+    // 보스 Recover 사용 여부(2페부터 확률)
+    private bool ShouldBossRecover()
+    {
+        if (bossPhase < 2) return false;
+        if (boss.hp >= boss.maxHP) return false; // 풀피면 Recover 의미 없음
+
+        float chance = (bossPhase == 2) ? bossRecoverChancePhase2 : bossRecoverChancePhase3;
+
+        // 플레이어가 1마리만 남아있으면(보스가 안정적으로 끝낼 수 있으니) Recover 확률 약간 낮춤
+        int alive = CountAlive();
+        if (alive <= 1) chance *= 0.70f;
+
+        // missingHP가 거의 없으면 Recover 확률 낮춤
+        int missing = boss.maxHP - boss.hp;
+        float missingRatio = missing / (float)boss.maxHP;
+        if (missingRatio < 0.10f) chance *= 0.40f;
+
+        return Random.value < chance;
+    }
+
+    // 보스 회복량 계산(밸런스 제한 포함)
+    private int ComputeBossHeal()
+    {
+        int heal = Mathf.CeilToInt(boss.maxHP * bossRecoverRatio);
+
+        int missing = boss.maxHP - boss.hp;
+        int cap = Mathf.CeilToInt(missing * bossRecoverCapMissingRatio);
+
+        heal = Mathf.Min(heal, Mathf.Max(1, cap));
+        return Mathf.Max(1, heal);
     }
 
     // 보스 AoE 사용 여부(2페부터 확률)
@@ -456,7 +540,11 @@ public class GameManager : MonoBehaviour
     private void RefreshBossPhaseUpOnly()
     {
         int computed = ComputeBossPhaseByRatio();
-        if (computed > bossPhase) bossPhase = computed;
+        if (computed > bossPhase)
+        {
+            bossPhase = computed;
+            ApplyBossPhaseVisuals(); // 페이즈가 올라가는 순간 배경/보스 스프라이트 교체
+        }
     }
 
     private int ComputeBossPhaseByRatio()
@@ -469,6 +557,10 @@ public class GameManager : MonoBehaviour
 
     private int GetBossAttack()
     {
+        // 요청 스탯 고정:
+        // 1페: ATK 28 / DEF 16
+        // 2페: ATK 31 / DEF 18
+        // 3페: ATK 34 / DEF 20
         if (bossPhase == 1) return 28;
         if (bossPhase == 2) return 31;
         return 34;
@@ -479,6 +571,34 @@ public class GameManager : MonoBehaviour
         if (bossPhase == 1) return 16;
         if (bossPhase == 2) return 18;
         return 20;
+    }
+
+    // 페이즈별 배경/보스 스프라이트 적용
+    private void ApplyBossPhaseVisuals()
+    {
+        // 배경
+        if (backgroundImage != null)
+        {
+            Sprite bg = null;
+            if (bossPhase == 1) bg = battleBackground01;
+            else if (bossPhase == 2) bg = battleBackground02;
+            else bg = battleBackground03;
+
+            if (bg != null) backgroundImage.sprite = bg;
+            backgroundImage.preserveAspect = true;
+        }
+
+        // 보스 공룡 스프라이트
+        if (enemyDinoImage != null)
+        {
+            Sprite s = null;
+            if (bossPhase == 1) s = enemyDinoPhase1;
+            else if (bossPhase == 2) s = enemyDinoPhase2;
+            else s = enemyDinoPhase3;
+
+            if (s != null) enemyDinoImage.sprite = s;
+            enemyDinoImage.preserveAspect = true;
+        }
     }
 
     // ===================== 공통: 데미지/체크 =====================
@@ -565,22 +685,22 @@ public class GameManager : MonoBehaviour
     }
 
     // ===================== 종료 =====================
-private void LogMiniGameAndAppliedStats(bool hasField, int fieldTier, bool hasLake, int lakeTier)
-{
-    string TierName(int t) => (t == 1) ? "Low" : (t == 2) ? "Mid" : "High";
+    private void LogMiniGameAndAppliedStats(bool hasField, int fieldTier, bool hasLake, int lakeTier)
+    {
+        string TierName(int t) => (t == 1) ? "Low" : (t == 2) ? "Mid" : "High";
 
-    // BuildParty() 기준: 0=Starter, 1=Attacker(Dino2=Field), 2=Tank(Dino3=Lake)
-    var starter  = party[0];
-    var attacker = party[1];
-    var tank     = party[2];
+        // BuildParty() 기준: 0=Starter, 1=Attacker(Dino2=Field), 2=Tank(Dino3=Lake)
+        var starter = party[0];
+        var attacker = party[1];
+        var tank = party[2];
 
-    string fieldInfo = hasField ? TierName(fieldTier) : "None(Default Mid)";
-    string lakeInfo  = hasLake  ? TierName(lakeTier)  : "None(Default Mid)";
+        string fieldInfo = hasField ? TierName(fieldTier) : "None(Default Mid)";
+        string lakeInfo = hasLake ? TierName(lakeTier) : "None(Default Mid)";
 
-    Debug.Log($"[BATTLE] Field Tier: {fieldInfo} | FieldScore={MiniGameProgress.FieldScore} | Dino2(Attacker) => HP {attacker.maxHP}, ATK {attacker.atk}, DEF {attacker.def}");
-    Debug.Log($"[BATTLE] Lake  Tier: {lakeInfo}  | LakeScore={MiniGameProgress.LakeScore}  | Dino3(Tank)     => HP {tank.maxHP}, ATK {tank.atk}, DEF {tank.def}");
-    Debug.Log($"[BATTLE] Starter(Fixed) => HP {starter.maxHP}, ATK {starter.atk}, DEF {starter.def}");
-}
+        Debug.Log($"[BATTLE] Field Tier: {fieldInfo} | FieldScore={MiniGameProgress.FieldScore} | Dino2(Attacker) => HP {attacker.maxHP}, ATK {attacker.atk}, DEF {attacker.def}");
+        Debug.Log($"[BATTLE] Lake  Tier: {lakeInfo}  | LakeScore={MiniGameProgress.LakeScore}  | Dino3(Tank)     => HP {tank.maxHP}, ATK {tank.atk}, DEF {tank.def}");
+        Debug.Log($"[BATTLE] Starter(Fixed) => HP {starter.maxHP}, ATK {starter.atk}, DEF {starter.def}");
+    }
 
     private void EndBattle(bool playerWon)
     {
