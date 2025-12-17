@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 963f73501b9c41349b05a546cb562dc0
+guid: b036eb3d165bda045babee7fe16db2f8
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 25
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Fern_tree2_0
+      name: White-red_mushroom2_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 0
-        width: 57
-        height: 64
+        x: 10
+        y: 3
+        width: 44
+        height: 58
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,8 +112,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2e43c79fd41b74647bccd850d0df0701
-      internalID: 212786113
+      spriteID: 36443e5eb7f97e44c95d1d857b21af1a
+      internalID: -1481388121
       vertices: []
       indices: 
       edges: []
@@ -122,7 +122,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 59bbc0bf089815641b484381e555ae39
+    spriteID: c9b819dd9953ea74f892dfa00ab9213b
     internalID: 0
     vertices: []
     indices: 
@@ -132,7 +132,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Fern_tree2_0: 212786113
+      White-red_mushroom2_0: -1481388121
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

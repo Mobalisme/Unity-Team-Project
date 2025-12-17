@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 963f73501b9c41349b05a546cb562dc0
+guid: 161d238d227531346a027c832e67d1af
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Fern_tree2_0
+      name: Luminous_tree2_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 0
-        width: 57
-        height: 64
+        x: 31
+        y: 22
+        width: 65
+        height: 84
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,8 +112,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2e43c79fd41b74647bccd850d0df0701
-      internalID: 212786113
+      spriteID: 7236b6add62820f47922222148331b9a
+      internalID: -402419983
       vertices: []
       indices: 
       edges: []
@@ -122,7 +122,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 59bbc0bf089815641b484381e555ae39
+    spriteID: 956b10e1c2d454c4487c3d3609fce0ee
     internalID: 0
     vertices: []
     indices: 
@@ -132,7 +132,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Fern_tree2_0: 212786113
+      Luminous_tree2_0: -402419983
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

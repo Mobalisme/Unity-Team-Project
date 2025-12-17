@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 963f73501b9c41349b05a546cb562dc0
+guid: 4669d8dc849216b48b09d8160986acbb
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Fern_tree2_0
+      name: Light_balls_tree2_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 0
-        width: 57
-        height: 64
+        x: 41
+        y: 29
+        width: 45
+        height: 70
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,8 +112,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2e43c79fd41b74647bccd850d0df0701
-      internalID: 212786113
+      spriteID: 5d7fc901b7d40594fbdb4f2ffd6df930
+      internalID: 2016293286
       vertices: []
       indices: 
       edges: []
@@ -122,7 +122,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 59bbc0bf089815641b484381e555ae39
+    spriteID: ef4ad84e8a9464f409388c3c57b2c74e
     internalID: 0
     vertices: []
     indices: 
@@ -132,7 +132,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Fern_tree2_0: 212786113
+      Light_balls_tree2_0: 2016293286
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

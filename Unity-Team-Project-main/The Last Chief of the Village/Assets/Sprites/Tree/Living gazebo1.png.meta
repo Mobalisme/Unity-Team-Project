@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 963f73501b9c41349b05a546cb562dc0
+guid: cd7da441c84db9147bf28c4c8b32f3a0
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -95,34 +95,12 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: Fern_tree2_0
-      rect:
-        serializedVersion: 2
-        x: 3
-        y: 0
-        width: 57
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2e43c79fd41b74647bccd850d0df0701
-      internalID: 212786113
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 59bbc0bf089815641b484381e555ae39
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -131,8 +109,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Fern_tree2_0: 212786113
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
